@@ -7,6 +7,18 @@
 class dnsclient ($dns) {
   file { '/etc/systemd/resolved.conf':
     ensure  => file,
-    content => template('dnsclient/resolved.conf.erb')
+    content => template('dnsclient/resolved.conf.erb'),
+    notify  => Service['systemd-resolved']
+  }
+
+  service { 'systemd-resolved':
+    ensure    => running,
+    enable    => true,
+    subscribe => File['/etc/systemd/resolved.conf'],
+  }
+
+  file { '/etc/resolv.conf':
+    ensure => link,
+    target => '/run/systemd/resolve/resolv.conf',
   }
 }
