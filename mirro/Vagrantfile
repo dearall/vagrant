@@ -72,7 +72,7 @@ Vagrant.configure("2") do |config|
   # SHELL
   config.vm.provision :puppet do |puppet|
     puppet.manifests_path = "../puppet-apply/dnsclient/manifests"
-    puppet.manifest_file = "dns_private.pp"
-    puppet.module_path = "../puppet-apply/dnsclient/modules"
+    puppet.manifest_file = "dnsclient.pp"
+    # puppet.module_path = "../puppet-apply/dnsclient/modules"
   end
 end
