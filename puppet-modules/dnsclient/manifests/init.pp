@@ -8,7 +8,8 @@ class dnsclient ($dns) {
   file { '/etc/systemd/resolved.conf':
     ensure  => file,
     content => template('dnsclient/resolved.conf.erb'),
-    notify  => Service['systemd-resolved']
+    notify  => Service['systemd-resolved'],
+    backup  => true,
   }
 
   service { 'systemd-resolved':
