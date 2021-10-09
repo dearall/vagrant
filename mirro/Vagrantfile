@@ -71,8 +71,8 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   config.vm.provision :puppet do |puppet|
+    # puppet.module_path = "../puppet-apply/dnsclient/modules"
     puppet.manifests_path = "../puppet-apply/dnsclient/manifests"
     puppet.manifest_file = "dnsclient.pp"
-    # puppet.module_path = "../puppet-apply/dnsclient/modules"
   end
 end

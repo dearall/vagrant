@@ -1,6 +1,4 @@
-
 $ip = '192.168.0.2'
-
 $resolvedconf = @("RESOLVEDCONF")
                 #  This file is part of systemd.
                 #
@@ -37,7 +35,7 @@ $resolvedconf = @("RESOLVEDCONF")
 class dnsclient {
   file { '/etc/systemd/resolved.conf':
     ensure  => file,
-    content => $resolvedconf,               # template('dnsclient/resolved.conf.erb'),
+    content => $::resolvedconf,               # template('dnsclient/resolved.conf.erb'),
     notify  => Service['systemd-resolved'],
     backup  => true,
   }
