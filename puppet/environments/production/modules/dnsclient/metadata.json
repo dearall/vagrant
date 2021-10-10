@@ -1,6 +1,6 @@
 {
   "name": "devalone-dnsclient",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "author": "devalone",
   "summary": "config dnsclient using private dns server, ip:192.168.0.2",
   "license": "Apache-2.0",

@@ -4,7 +4,7 @@
 #
 # @example
 #   include dnsclient
-class dnsclient ($dns) {
+class dnsclient ($dns, $dns_stub_listener) {
   file { '/etc/systemd/resolved.conf':
     ensure  => file,
     content => template('dnsclient/resolved.conf.erb'),
