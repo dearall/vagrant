@@ -73,11 +73,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision :puppet do |puppet|
     # apply mainifest_file
     puppet.manifests_path = "../puppet/puppet-apply/dnsclient/manifests"
-    puppet.manifest_file = "dnsclient.pp"
+    # puppet.manifest_file = "dnsclient.pp"
 
     # apply module_path
-    # puppet.module_path = "../puppet/puppet-apply/dnsclient/modules"
-    # puppet.manifest_file = "dnsclient_m.pp"
+    puppet.module_path = "../puppet/puppet-apply/dnsclient/modules"
+    puppet.manifest_file = "dnsclient_m.pp"
 
     # apply environment
     # puppet.environment_path = "../puppet/environments"
