@@ -12,25 +12,13 @@
 # See resolved.conf(5) for details
 
 [Resolve]
-<% if @dns then -%>
-DNS=<%= @dns -%>
-<% else %>
-#DNS=
-<%- end -%>
-<%- if @fallback_dns then -%>
-FallbackDNS=<%= @fallback_dns -%>
-<% else %>
+DNS=<%= @dns %>
 #FallbackDNS=
-<% end -%>
-<%- if @domains then -%>
-Domains=<%= @domains -%>
-<% else -%>
 #Domains=
-<% end %>
-LLMNR=<%= @llmnr %>
-MulticastDNS=<%= @multicast_dns %>
-DNSSEC=<%= @dnssec %>
-DNSOverTLS=<%= @dns_over_tls %>
-Cache=<%= @cache %>
+#LLMNR=no
+#MulticastDNS=no
+#DNSSEC=no
+#DNSOverTLS=no
+#Cache=no-negative
 DNSStubListener=<%= @dns_stub_listener %>
-ReadEtcHosts=<%= @read_etc_hosts%>
+#ReadEtcHosts=yes

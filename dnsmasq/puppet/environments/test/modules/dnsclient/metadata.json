@@ -1,11 +1,10 @@
 {
-  "name": "devalone-resolved",
-  "version": "1.0.0",
+  "name": "devalone-dnsclient",
+  "version": "0.2.1",
   "author": "devalone",
-  "summary": "Config the /etc/systemd/resolved.conf and /etc/resolv.conf simbol link to instruct systemd-resolved.service using dns server(s)",
+  "summary": "config dnsclient using private dns server, ip:192.168.0.2",
   "license": "Apache-2.0",
-  "source": "https://github.com/dearall/devalone-resolved.git",
-  "project_page": "https://github.com/dearall/devalone-resolved.git",
+  "source": "",
   "dependencies": [
 
   ],

@@ -1,12 +1,12 @@
 $ip = '192.168.0.2 211.137.160.5 211.137.160.185'
 $fallback_dns = undef
-$domains = undef
+$domains = 'sansovo.org'
 $llmnr = 'no'
 $multicast_dns = 'no'
 $dnssec = 'no'
 $dns_over_tls = 'no'
 $cache = 'no-negative'
-$dns_stub_listener = 'yes'
+$dns_stub_listener = 'no'
 $read_etc_hosts = 'yes'
 $resolvedconf = @("RESOLVEDCONF")
                 #  This file is part of systemd.
@@ -44,7 +44,7 @@ $resolvedconf = @("RESOLVEDCONF")
 class dnsclient {
   file { '/etc/systemd/resolved.conf':
     ensure  => file,
-    content => $::resolvedconf,               # template('dnsclient/resolved.conf.erb'),
+    content => $::resolvedconf,
     notify  => Service['systemd-resolved'],
     backup  => true,
   }

@@ -1,0 +1,11 @@
+--- 
+resolved::dns: ~
+resolved::fallback_dns: ~
+resolved::domains: ~
+resolved::llmnr: 'no'
+resolved::multicast_dns: 'no'
+resolved::dnssec: 'no'
+resolved::dns_over_tls: 'no'
+resolved::cache: 'no-negative'
+resolved::dns_stub_listener: 'yes'
+resolved::read_etc_hosts: 'yes'
