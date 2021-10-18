@@ -1,4 +1,4 @@
-$ip = '192.168.0.2 211.137.160.5 211.137.160.185'
+$dns = '192.168.0.2 211.137.160.5'
 $fallback_dns = undef
 $domains = undef
 $llmnr = 'no'
@@ -23,7 +23,7 @@ $resolvedconf = @("RESOLVEDCONF")
                 # See resolved.conf(5) for details
 
                 [Resolve]
-                DNS=${ip}
+                DNS=${dns}
                 FallbackDNS=${fallback_dns}
                 Domains=${domains}
                 LLMNR=${llmnr}
