@@ -1,13 +1,14 @@
-# @summary Config the /etc/systemd/resolved.conf and /etc/resolv.conf simbol link to instruct systemd-resolved.service using dns server(s)
-#
-# resolved
-#
-# Main class, config the /etc/systemd/resolved.conf and relative systemd-resolved.service, as well as /etc/resolv.conf simbol link.
+# @summary Config the /etc/systemd/resolved.conf and /etc/resolv.conf simbol link to instruct systemd-resolved.service using dns server(s).
 #
 # @example
-#   include resolved
+#   class { 'resolved':
+#     dns               => '192.168.0.2 211.137.160.5',
+#     domains           => 'sansovo.org',
+#     dns_stub_listener => 'yes',
+#     cache             => 'no-negative',
+#   }
 #
-# See resolved.conf(5) for details
+# @see resolved.conf(5) for details
 #
 # @param dns
 #   A space-separated list of IPv4 and IPv6 addresses to use as system DNS servers. DNS requests are sent to one of the listed DNS servers 
