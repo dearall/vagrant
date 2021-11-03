@@ -70,7 +70,7 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
-
+  # apply resolved module
   config.vm.provision :puppet do |puppet|
     # apply mainifest_file
     puppet.manifests_path = "puppet/puppet-apply/dnsclient/manifests"
@@ -86,14 +86,25 @@ Vagrant.configure("2") do |config|
 
     puppet.options = "--test --verbose"
   end
+  # apply dnsmasq module
   config.vm.provision :puppet do |puppet|
     # apply mainifest_file
     puppet.manifests_path = "puppet/puppet-apply/dnsmasq/manifests"
-    # puppet.manifest_file = "dnsclient.pp"
 
     # apply module_path
     puppet.module_path = "puppet/modules"
     puppet.manifest_file = "dnsmasq.pp"
+
+    puppet.options = "--test --verbose"
+  end
+  # apply ntp module
+  config.vm.provision :puppet do |puppet|
+    # apply mainifest_file
+    puppet.manifests_path = "puppet/puppet-apply/ntp/manifests"
+
+    # apply module_path
+    puppet.module_path = "puppet/modules"
+    puppet.manifest_file = "ntp.pp"
 
     puppet.options = "--test --verbose"
   end
