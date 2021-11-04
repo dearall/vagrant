@@ -1,0 +1,7 @@
+# resolv-file for dnsmasq
+# 天津移动 dns
+nameserver 211.137.160.5
+nameserver 211.137.160.185
+# 公用
+namserver 114.114.114.114
+nameserver 8.8.8.8
