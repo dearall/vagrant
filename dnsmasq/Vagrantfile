@@ -82,14 +82,14 @@ Vagrant.configure("2") do |config|
 
   # apply resolved module
   config.vm.provision :puppet do |puppet|
+    # apply module_path
+    puppet.module_path = ["../puppet/puppet-modules"]
+
     # apply mainifest_file
     puppet.manifests_path = "puppet/puppet-apply/dnsclient/manifests"
     # puppet.manifest_file = "dnsclient.pp"
-
-    # apply module_path
-    puppet.module_path = "../puppet/puppet-apply/dnsclient/modules"
     puppet.manifest_file = "dns_resolved.pp"
-
+    
     # apply environment
     # puppet.environment_path = "puppet/environments"
     # puppet.environment = "production"
@@ -98,11 +98,11 @@ Vagrant.configure("2") do |config|
   end
   # apply dnsmasq module
   config.vm.provision :puppet do |puppet|
+    # apply module_path
+    puppet.module_path = ["puppet/modules"]
+    
     # apply mainifest_file
     puppet.manifests_path = "puppet/puppet-apply/dnsmasq/manifests"
-
-    # apply module_path
-    puppet.module_path = "puppet/modules"
     puppet.manifest_file = "dnsmasq.pp"
 
     puppet.options = "--test --verbose"
@@ -113,13 +113,13 @@ Vagrant.configure("2") do |config|
     puppet.manifests_path = "puppet/puppet-apply/ntp/manifests"
 
     # apply module_path
-    puppet.module_path = "puppet/modules"
+    puppet.module_path = ["puppet/modules"]
     puppet.manifest_file = "ntp.pp"
 
     puppet.options = "--test --verbose"
   end
-
-  config.vm.provision "endup", type: "shell", privileged: true do |s|
+  # endup
+  config.vm.provision "endup", type: "shell", privileged: true, run: "always" do |s|
     s.inline = $endup
   end
 end
@@ -127,13 +127,17 @@ end
 $bootstrap = <<-SCRIPT
 mv /tmp/files/hosts /etc/hosts
 mv /tmp/files/resolv.conf.dnsmasq /etc/resolv.conf.dnsmasq
+systemctl stop puppet.service
 apt-get update
+apt-get install --only-upgrade puppet-agent
 source /etc/profile.d/puppet-agent.sh
 puppet config set server puppetserver.sansovo.org --section main
+puppet ssl bootstrap
 SCRIPT
 
 $endup = <<-SCRIPT
 apt-get clean
+sudo systemctl restart dnsmasq.service
 SCRIPT
 
 # puppet ssl bootstrap
