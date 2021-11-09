@@ -74,13 +74,15 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
 
+  # vagrant file
   config.vm.provision "file", source: "./files", destination: "/tmp/"
 
+  # shell bootstrap
   config.vm.provision "bootstrap", type: "shell", privileged: true do |s|
     s.inline = $bootstrap
   end
 
-  # apply resolved module
+  # puppet apply resolved module
   config.vm.provision :puppet do |puppet|
     # apply module_path
     puppet.module_path = ["../puppet/puppet-modules"]
@@ -97,12 +99,12 @@ Vagrant.configure("2") do |config|
     puppet.options = "--test --verbose"
   end
 
-  # seperator print
+  # shell seperator print
   config.vm.provision "seperator1", type: "shell", privileged: true do |s|
     s.inline = $seperator1
   end
 
-  # apply dnsmasq module
+  # puppet apply dnsmasq module
   config.vm.provision :puppet do |puppet|
     # apply module_path
     puppet.module_path = ["puppet/modules"]
@@ -114,12 +116,12 @@ Vagrant.configure("2") do |config|
     puppet.options = "--test --verbose"
   end
 
-  # seperator print
+  # shell seperator print
   config.vm.provision "seperator2", type: "shell", privileged: true do |s|
     s.inline = $seperator2
   end
 
-  # apply ntp module
+  # puppet apply ntp module
   config.vm.provision :puppet do |puppet|
     # apply module_path
     puppet.module_path = ["puppet/modules"]
@@ -130,9 +132,10 @@ Vagrant.configure("2") do |config|
 
     puppet.options = "--test --verbose"
   end
-  # endup
-  config.vm.provision "endup", type: "shell", privileged: true, run: "always" do |s|
-    s.inline = $endup
+
+  # shell end
+  config.vm.provision "end", type: "shell", privileged: true, run: "always" do |s|
+    s.inline = $end
   end
 end
 
@@ -155,7 +158,7 @@ $seperator2 = <<-SCRIPT
 echo 'puppet dnsmasq module complete.'
 SCRIPT
 
-$endup = <<-SCRIPT
+$end = <<-SCRIPT
 apt-get clean
 sudo systemctl restart dnsmasq.service
 SCRIPT

@@ -12,7 +12,6 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-
   config.vm.box = "devalone/ubuntu-20.04-server-x64-puppet"
 
   # Disable automatic box update checking. If you disable this, then
@@ -55,7 +54,8 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider "virtualbox" do |vb|
   #   # name this virtual machine
-      vb.name = "tomcat"
+      vb.name = "tomcat-alone-product"
+  #
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
@@ -74,6 +74,7 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
 
+
   # shell bootstrap
   config.vm.provision "bootstrap", type: "shell", privileged: true do |s|
     s.inline = $bootstrap
@@ -82,10 +83,10 @@ Vagrant.configure("2") do |config|
   # puppet apply dns resolved
   config.vm.provision :puppet do |puppet|
     # apply module_path
-    puppet.module_path = ["../../puppet/puppet-modules"]
+    puppet.module_path = ["../../../puppet/puppet-modules"]
     
     # apply mainifest_file
-    puppet.manifests_path = "../../puppet/puppet-apply/dnsclient/manifests"
+    puppet.manifests_path = "../../../puppet/puppet-apply/dnsclient/manifests"
     puppet.manifest_file = "dns_resolved.pp"
 
     # apply environment
@@ -100,16 +101,16 @@ Vagrant.configure("2") do |config|
     s.inline = $seperator1
   end
 
-  # puppet apply dns adoptjdk11
+  # puppet apply ntp module
   config.vm.provision :puppet do |puppet|
     # apply module_path
-    puppet.module_path = ["../../puppet/puppet-modules"]
+    puppet.module_path = ["../../../puppet/puppet-modules"]
     
     # apply mainifest_file
-    puppet.manifests_path = "../../puppet/puppet-apply/adoptjdk11/manifests"
-    puppet.manifest_file = "adoptjdk11.pp"
+    puppet.manifests_path = "../../../puppet/puppet-apply/ntp/manifests"
+    puppet.manifest_file = "ntp.pp"
 
-    puppet.options = "--test"
+    puppet.options = "--test --verbose"
   end
 
   # shell seperator
@@ -117,16 +118,43 @@ Vagrant.configure("2") do |config|
     s.inline = $seperator2
   end
 
+  # puppet apply adoptjdk11
+  config.vm.provision :puppet do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+    
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/adoptjdk11/manifests"
+    puppet.manifest_file = "adoptjdk11.pp"
+
+    puppet.options = "--test"
+  end
+
+  # shell seperator
+  config.vm.provision "seperator3", type: "shell", privileged: true do |s|
+    s.inline = $seperator3
+  end
+
   # shell JAVA_HOME
   config.vm.provision "java_home", type: "shell", privileged: true do |s|
     s.inline = $java_home
   end
 
-  # run puppet agent
-  config.vm.provision "puppet_server" do |puppet|
-    puppet.puppet_server = "puppetserver.sansovo.org"
-    puppet.puppet_node = "tomcat.sansovo.org"
-    puppet.options = "--verbose --test"
+  # shell seperator
+  config.vm.provision "seperator4", type: "shell", privileged: true do |s|
+    s.inline = $seperator4
+  end
+
+  # puppet apply tomcat9
+  config.vm.provision :puppet do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+    
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
+    puppet.manifest_file = "tomcat9.pp"
+
+    puppet.options = "--test"
   end
 
   # shell end
@@ -135,6 +163,7 @@ Vagrant.configure("2") do |config|
   end
 end
 
+
 # inline shell scripts
 $bootstrap = <<-SCRIPT
 source /etc/profile.d/puppet-agent.sh
@@ -142,7 +171,6 @@ systemctl stop puppet.service
 puppet config set server puppetserver.sansovo.org --section main
 apt-get update
 apt-get install --only-upgrade puppet-agent
-puppet ssl bootstrap
 SCRIPT
 
 $seperator1 = <<-SCRIPT
@@ -150,13 +178,22 @@ echo 'seperator: puppet resolved module complete.'
 SCRIPT
 
 $seperator2 = <<-SCRIPT
-echo 'seperator: puppet adoptjdk11 module complete.'
+echo 'seperator: puppet apply ntp module complete.'
+SCRIPT
+
+$seperator3 = <<-SCRIPT
+echo 'seperator: puppet apply adoptjdk11 module complete.'
 SCRIPT
 
 $java_home = <<-SCRIPT
 source /etc/profile
 SCRIPT
 
+$seperator4 = <<-SCRIPT
+echo 'seperator: source /etc/profile complete.'
+SCRIPT
+
 $end = <<-SCRIPT
 apt-get clean
+echo 'vagrant provision finished.'
 SCRIPT

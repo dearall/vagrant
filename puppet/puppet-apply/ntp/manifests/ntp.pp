@@ -1,20 +1,3 @@
-# 本地时区
-include localtime
-
-# dns 客户端
-# class { 'dnsclient':
-#   dns               => '192.168.0.2',
-#   dns_stub_listener => 'no',
-# }
-
-# dns 客户端
-class { 'resolved':
-  dns               => '192.168.0.2',
-  domains           => 'sansovo.org',
-  dns_stub_listener => 'yes',
-  cache             => 'no-negative',
-}
-
 # client ntp
 class { 'ntp':
   servers  => ['192.168.0.2 prefer','cn.ntp.org.cn'],
@@ -33,10 +16,8 @@ class { 'ntp':
   ],
 }
 
-node 'tomcat.sansovo.org' {
-  class { 'adoptjdk11':
-  }
-  -> class { 'tomcat9':
-    java_home => '/usr/lib/jvm/jdk-11.0.13+8',
-  }
+# 设置本地时区
+file { '/etc/localtime':
+  ensure => link,
+  target => '/usr/share/zoneinfo/Asia/Shanghai',
 }
