@@ -21,4 +21,4 @@ class tomcat9 {
   notify { 'Installing tomcat9...':}
 }
 
-Class['adoptjdk11'] -> Class['tomcat9']
+# Class['adoptjdk11'] -> Class['tomcat9']

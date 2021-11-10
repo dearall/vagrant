@@ -90,10 +90,6 @@ Vagrant.configure("2") do |config|
 
     puppet.options = "--test"
   end
-  # shell JAVA_HOME
-  config.vm.provision "java_home", type: "shell", privileged: true do |s|
-    s.inline = $java_home
-  end
 
   # puppet apply environment
   config.vm.provision "puppet" do |puppet|
@@ -105,6 +101,23 @@ Vagrant.configure("2") do |config|
     puppet.environment = "develop"
 
     puppet.options = "--test --verbose"
+  end
+
+  # shell JAVA_HOME
+  config.vm.provision "java_home", type: "shell", privileged: true do |s|
+    s.inline = $java_home
+  end
+
+  # puppet apply tomcat9
+  config.vm.provision :puppet, run: "always" do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
+    puppet.manifest_file = "tomcat9.pp"
+
+    puppet.options = "--test"
   end
 
   # shell end

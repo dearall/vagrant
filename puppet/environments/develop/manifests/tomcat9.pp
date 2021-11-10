@@ -1,7 +1,5 @@
 # 通过 puppetlabs-tomcat 6.1.1 模块安装 tomcat9
-class tomcat9 (
-  $java_home      = undef,
-) {
+class tomcat9 {
   group { 'tomcat' :
     ensure => 'present',
   }
@@ -16,11 +14,11 @@ class tomcat9 (
     require    => User['tomcat']
   }
   tomcat::instance { 'default':
-    catalina_home => '/opt/tomcat9',
-    catalina_base => '/opt/tomcat9',
-    java_home     => $java_home,
-    service_name  => 'tomcat',
-    require       => Tomcat::Install['/opt/tomcat9'],
+    catalina_home  => '/opt/tomcat9',
+    catalina_base  => '/opt/tomcat9',
+    manage_service => true,
+    service_name   => 'tomcat',
+    require        => Tomcat::Install['/opt/tomcat9'],
   }
 
   notify { 'tomcat9 installed...':}

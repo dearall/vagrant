@@ -34,9 +34,6 @@ class { 'ntp':
 }
 
 node 'tomcat.sansovo.org' {
-  class { 'adoptjdk11':
-  }
-  -> class { 'tomcat9':
-    java_home => '/usr/lib/jvm/jdk-11.0.13+8',
-  }
+  include adoptjdk11
+  # include tomcat9
 }

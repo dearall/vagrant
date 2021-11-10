@@ -35,5 +35,5 @@ class { 'ntp':
 
 node 'tomcat.sansovo.org' {
   include adoptjdk11
-  include tomcat9
+  # include tomcat9
 }
