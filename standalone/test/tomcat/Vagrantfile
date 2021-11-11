@@ -79,18 +79,6 @@ Vagrant.configure("2") do |config|
     s.inline = $bootstrap
   end
 
-  # puppet apply java_home
-  config.vm.provision "puppet" do |puppet|
-    # apply module_path
-    puppet.module_path = ["../../../puppet/puppet-modules"]
-
-    # apply mainifest_file
-    puppet.manifests_path = "../../../puppet/puppet-apply/adoptjdk11/manifests"
-    puppet.manifest_file = "java_home.pp"
-
-    puppet.options = "--test"
-  end
-
   # puppet apply environment
   config.vm.provision "puppet" do |puppet|
     # apply module_path
@@ -98,7 +86,7 @@ Vagrant.configure("2") do |config|
 
     # apply environment
     puppet.environment_path = "../../../puppet/environments"
-    puppet.environment = "develop"
+    puppet.environment = "test"
 
     puppet.options = "--test --verbose"
   end
@@ -108,14 +96,40 @@ Vagrant.configure("2") do |config|
     s.inline = $java_home
   end
 
-  # puppet apply tomcat9
-  config.vm.provision :puppet, run: "always" do |puppet|
+  # puppet apply tomcat9 and starat tomcat service
+  # always run:
+  #
+  #   vagrant up
+  #   vagrant reload
+  #   vagrant provision
+  #   vagrant provision --provision-with start-tomcat
+  #
+  config.vm.provision "start-tomcat", type: "puppet", run: "always" do |puppet|
     # apply module_path
     puppet.module_path = ["../../../puppet/puppet-modules"]
 
     # apply mainifest_file
     puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
     puppet.manifest_file = "tomcat9.pp"
+
+    puppet.options = "--test"
+  end
+
+  # puppet apply stop tomcat9
+  # never run
+  #
+  # do the following command to execute this provision:
+  #
+  #   vagrant provision --provision-with stop-tomcat
+  #
+  #
+  config.vm.provision "stop-tomcat", type: "puppet", run: "never" do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
+    puppet.manifest_file = "tomcat9_stop.pp"
 
     puppet.options = "--test"
   end
