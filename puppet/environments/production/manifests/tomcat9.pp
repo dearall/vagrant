@@ -10,7 +10,7 @@ class tomcat9 {
     require    => Group['tomcat']
   }
   tomcat::install { '/opt/tomcat9':
-    source_url => 'https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v9.0.54/bin/apache-tomcat-9.0.54.tar.gz',
+    source_url => 'https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.58/bin/apache-tomcat-9.0.58.tar.gz',
     require    => User['tomcat']
   }
   tomcat::instance { 'default':

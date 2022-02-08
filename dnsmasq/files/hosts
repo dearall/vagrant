@@ -1,6 +1,5 @@
 192.168.0.2     dnsmasq.sansovo.org         dnsmasq
 127.0.0.1       localhost
-127.0.1.1       localhost
 
 192.168.0.20    puppetserver.sansovo.org    puppetserver
 192.168.0.21    tomcat.sansovo.org          tomcat

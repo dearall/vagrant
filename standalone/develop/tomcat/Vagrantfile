@@ -74,9 +74,20 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
 
+  # vagrant file provision
+  config.vm.provision "file", source: "../../files", destination: "/tmp/"
+
   # shell bootstrap
   config.vm.provision "bootstrap", type: "shell", privileged: true do |s|
     s.inline = $bootstrap
+  end
+
+  # shell set puppet server config, 只手动执行，避免重复执行私钥不匹配:
+  #
+  # vagrant provision --provision-with set-puppet-server
+  #
+  config.vm.provision "set-puppet-server", type: "shell", run: "never", privileged: true do |s|
+    s.inline = $set_puppet_server
   end
 
   # puppet apply environment
@@ -96,7 +107,7 @@ Vagrant.configure("2") do |config|
   #   s.inline = $java_home
   # end
 
-  # puppet apply tomcat9 and starat tomcat service
+  # puppet apply tomcat9 and start tomcat service
   # always run:
   #
   #   vagrant up
@@ -142,11 +153,18 @@ end
 
 # inline shell scripts
 $bootstrap = <<-SCRIPT
+cp /tmp/files/tomcat-users.xml /opt/tomcat9/conf/tomcat-users.xml
+mv /tmp/files/tomcat-users.xml /opt/tomcat9_base/conf/tomcat-users.xml
 source /etc/profile.d/puppet-agent.sh
 systemctl stop puppet.service
-puppet config set server puppetserver.sansovo.org --section main
+
 apt-get update
 apt-get install --only-upgrade puppet-agent
+SCRIPT
+
+# set puppet server shell script
+$set_puppet_server = <<-SCRIPT
+puppet config set server puppetserver.sansovo.org --section main
 SCRIPT
 
 $java_home = <<-SCRIPT
