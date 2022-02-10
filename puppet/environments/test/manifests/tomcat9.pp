@@ -9,14 +9,19 @@ class tomcat9 {
     managehome => true,
     require    => Group['tomcat']
   }
+
   tomcat::install { '/opt/tomcat9':
-    source_url => 'https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.58/bin/apache-tomcat-9.0.58.tar.gz',
-    require    => User['tomcat']
-  }
-  tomcat::instance { 'default':
+    source_url    => 'https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.58/bin/apache-tomcat-9.0.58.tar.gz',
     catalina_home => '/opt/tomcat9',
-    catalina_base => '/opt/tomcat9_base',
+    require       => User['tomcat']
   }
+  tomcat::service { 'default':
+    service_ensure => 'stopped',
+    service_name   => 'tomcat9',
+    catalina_home  => '/opt/tomcat9',
+    catalina_base  => '/opt/tomcat9',
+  }
+
 
   notify { 'Installing tomcat9...':}
 }

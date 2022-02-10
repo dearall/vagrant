@@ -2,12 +2,6 @@
 include localtime
 
 # dns 客户端
-# class { 'dnsclient':
-#   dns               => '192.168.0.2',
-#   dns_stub_listener => 'no',
-# }
-
-# dns 客户端
 class { 'resolved':
   dns               => '192.168.0.2',
   domains           => 'sansovo.org',
@@ -33,7 +27,7 @@ class { 'ntp':
   ],
 }
 
-node 'tomcat.sansovo.org' {
+node /^tomcat(-|_)?\w*\.sansovo\.org$/ {
   include adoptjdk11
-  # include tomcat9
+  include tomcat9
 }

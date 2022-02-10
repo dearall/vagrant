@@ -1,10 +1,15 @@
-192.168.0.2     dnsmasq.sansovo.org         dnsmasq
+192.168.0.2     dnsmasq.sansovo.org               dnsmasq
 127.0.0.1       localhost
 
-192.168.0.20    puppetserver.sansovo.org    puppetserver
-192.168.0.21    tomcat.sansovo.org          tomcat
-192.168.0.22    web.sansovo.org             web
-192.168.0.23    db.sansovo.org              db
+192.168.0.20    puppetserver.sansovo.org          puppetserver
+
+192.168.0.21    tomcat.sansovo.org                tomcat
+192.168.0.22    web.sansovo.org                   web
+192.168.0.23    db.sansovo.org                    db
+
+192.168.0.30    tomcat-develop.sansovo.org        tomcat-develop
+192.168.0.31    tomcat-test.sansovo.org           tomcat-test
+192.168.0.32    tomcat-production.sansovo.org     tomcat-production
 
 
 # The following lines are desirable for IPv6 capable hosts

@@ -1,8 +1,8 @@
 {
   "name": "devalone-resolved",
-  "version": "1.0.0",
+  "version": "1.1.5",
   "author": "devalone",
-  "summary": "Config the /etc/systemd/resolved.conf and /etc/resolv.conf simbol link to instruct systemd-resolved.service using dns server(s)",
+  "summary": "Manage the /etc/systemd/resolved.conf file content, and the /etc/resolv.conf simbol link to instruct systemd-resolved.service using the indicated private, and/or public dns server(s).",
   "license": "Apache-2.0",
   "source": "https://github.com/dearall/devalone-resolved.git",
   "project_page": "https://github.com/dearall/devalone-resolved.git",

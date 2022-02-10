@@ -1,5 +1,7 @@
 # resolved
 
+Manage the /etc/systemd/resolved.conf file content, and the /etc/resolv.conf simbol link to instruct systemd-resolved.service using the indicated private, and/or public dns server(s).
+
 ## Table of Contents
 
 - [resolved](#resolved)
@@ -20,7 +22,7 @@
 
 ## Description
 
-The resolved module configures the /etc/systemd/resolved.conf and /etc/resolv.conf simbol link, manages the systemd-resolved service to use the indicated dns server(s).
+The resolved module configures the /etc/systemd/resolved.conf file content, and the /etc/resolv.conf simbol link, manages the systemd-resolved service to use the indicated private, and/or publice dns server(s).
 
 ## Setup
 
@@ -100,3 +102,5 @@ For an extensive list of supported operating systems, see metadata.json
 
 2021-10-18, version 1.0.0 released.
 2021-10-19, version 1.1.0 released.
+2021-11-02, version 1.1.4 released.
+2021-11-02, version 1.1.5 released.

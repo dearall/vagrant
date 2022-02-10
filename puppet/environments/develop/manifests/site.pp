@@ -33,7 +33,7 @@ class { 'ntp':
   ],
 }
 
-node 'tomcat.sansovo.org' {
+node /^tomcat(-|_)?\w*\.sansovo\.org$/ {
   include adoptjdk11
-  # include tomcat9
+  include tomcat9
 }

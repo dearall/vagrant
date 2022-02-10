@@ -1,6 +1,6 @@
 # Changelog
 
-## Release 1.1.3
+## Release 1.1.4
 
 **Features**
 

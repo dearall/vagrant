@@ -1,117 +1,106 @@
 # resolved
 
-Welcome to your new module. A short overview of the generated parts can be found
-in the [PDK documentation][1].
-
-The README template below provides a starting point with details about what
-information to include in your README.
+Manage the /etc/systemd/resolved.conf file content, and the /etc/resolv.conf simbol link to instruct systemd-resolved.service using the indicated private, and/or public dns server(s).
 
 ## Table of Contents
 
-1. [Description](#description)
-1. [Setup - The basics of getting started with resolved](#setup)
-    * [What resolved affects](#what-resolved-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with resolved](#beginning-with-resolved)
-1. [Usage - Configuration options and additional functionality](#usage)
-1. [Limitations - OS compatibility, etc.](#limitations)
-1. [Development - Guide for contributing to the module](#development)
+- [resolved](#resolved)
+  - [Table of Contents](#table-of-contents)
+  - [Description](#description)
+  - [Setup](#setup)
+    - [What resolved affects](#what-resolved-affects)
+    - [Beginning with resolved](#beginning-with-resolved)
+  - [Usage](#usage)
+    - [Using default parameters](#using-default-parameters)
+    - [I want use my own local network dns server](#i-want-use-my-own-local-network-dns-server)
+    - [I want use my own local network dns server, and public dns](#i-want-use-my-own-local-network-dns-server-and-public-dns)
+    - [Install `resolved` module on the same machine which the dns server running](#install-resolved-module-on-the-same-machine-which-the-dns-server-running)
+  - [Reference](#reference)
+  - [Limitations](#limitations)
+  - [Development](#development)
+  - [Release Notes](#release-notes)
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your
-module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module
-is what they want.
+The resolved module configures the /etc/systemd/resolved.conf file content, and the /etc/resolv.conf simbol link, manages the systemd-resolved service to use the indicated private, and/or publice dns server(s).
 
 ## Setup
 
-### What resolved affects **OPTIONAL**
+### What resolved affects
 
-If it's obvious what your module touches, you can skip this section. For
-example, folks can probably figure out that your mysql_instance module affects
-their MySQL instances.
+- This module alters the /etc/systemd/resolved.conf file contents, and alters the /etc/resolv.conf symbol link target to /run/systemd/resolve/resolv.conf.
 
-If there's more that they should know about, though, this is the place to
-mention:
-
-* Files, packages, services, or operations that the module will alter, impact,
-  or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled,
-another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps
-for upgrading, you might want to include an additional "Upgrading" section here.
+- The `dns` parameter is a space-separated list of IPv4 and IPv6 addresses to use as system DNS servers. The ip
+addresses in this list up to three, the extra ip addresses are ignored.
 
 ### Beginning with resolved
 
-The very basic steps needed for a user to get the module up and running. This
-can include setup steps, if necessary, or it can be an example of the most basic
-use of the module.
+`include resolved` is enough to get you up and running, this uses the **default** parameters to run resolved module. To pass in parameters specifying which dns server(s) to use:
+
+```puppet
+class { 'resolved':
+  dns => '192.168.0.2 211.137.160.5',
+}
+```
+
+NOTE: In this example, `192.168.0.2` is the local network dns server ip, and `211.137.160.5` is the public dns server ip address.
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your
-users how to use your module to solve problems, and be sure to include code
-examples. Include three to five examples of the most important or common tasks a
-user can accomplish with your module. Show users how to accomplish more complex
-tasks that involve different types, classes, and functions working in tandem.
+All parameters for the **resolved** module are contained within the main `resolved` class, so for any function of the module, set the options you want. See the common usages below for examples.
+
+### Using default parameters
+
+```puppet
+include resolved
+```
+
+### I want use my own local network dns server
+
+```puppet
+class { 'resolved':
+  dns => '192.168.0.2',
+}
+```
+
+### I want use my own local network dns server, and public dns
+
+set two or three dns servers: one or two for local network dns server, other(s) for public dns.
+
+```puppet
+class { 'resolved':
+  dns => '192.168.0.2 211.137.160.5',
+}
+```
+
+### Install `resolved` module on the same machine which the dns server running
+
+If you install `resolved` module on the samle machine which the dns server installed, set `dns_stub_listener` parameter to 'no', because they may listen on the same dns default netword port: 53.
+
+```puppet
+class { 'resolved':
+  dns               => '192.168.0.2',
+  dns_stub_listener => 'no',
+}
+```
 
 ## Reference
 
-This section is deprecated. Instead, add reference information to your code as
-Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your
-module. For details on how to add code comments and generate documentation with
-Strings, see the [Puppet Strings documentation][2] and [style guide][3].
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the
-root of your module directory and list out each of your module's classes,
-defined types, facts, functions, Puppet tasks, task plans, and resource types
-and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-* The data type, if applicable.
-* A description of what the element does.
-* Valid values, if the data type doesn't make it obvious.
-* Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
+See [REFERENCE.md](https://github.com/dearall/devalone-resolved/blob/master/REFERENCE.md)
 
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other
-warnings.
+This module has been tested on Open Source Puppet 7. It is tested on ubuntu 20.04.
+
+For an extensive list of supported operating systems, see metadata.json
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing
-to your project and how they should submit their work.
+[github https://github.com/dearall/devalone-resolved](https://github.com/dearall/devalone-resolved)
 
-## Release Notes/Contributors/Etc. **Optional**
+## Release Notes
 
-If you aren't using changelog, put your release notes here (though you should
-consider using changelog). You can also add any additional sections you feel are
-necessary or important to include here. Please use the `##` header.
-
-[1]: https://puppet.com/docs/pdk/latest/pdk_generating_modules.html
-[2]: https://puppet.com/docs/puppet/latest/puppet_strings.html
-[3]: https://puppet.com/docs/puppet/latest/puppet_strings_style.html
+2021-10-18, version 1.0.0 released.
+2021-10-19, version 1.1.0 released.
+2021-11-02, version 1.1.4 released.
+2021-11-02, version 1.1.5 released.
