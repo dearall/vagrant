@@ -9,7 +9,8 @@
 
 192.168.0.30    tomcat-develop.sansovo.org        tomcat-develop
 192.168.0.31    tomcat-test.sansovo.org           tomcat-test
-192.168.0.32    tomcat-production.sansovo.org     tomcat-production
+192.168.0.32    tomcat-uat.sansovo.org            tomcat-uat
+192.168.0.33    tomcat-production.sansovo.org     tomcat-production
 
 
 # The following lines are desirable for IPv6 capable hosts

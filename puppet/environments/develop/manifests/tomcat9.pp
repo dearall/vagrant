@@ -19,8 +19,6 @@ class tomcat9 {
   tomcat::service { 'default':
     service_ensure => 'stopped',
     service_name   => 'tomcat9',
-    catalina_home  => '/opt/tomcat9',
-    catalina_base  => '/opt/tomcat9_base',
   }
 
   notify { 'tomcat9 installed...':}

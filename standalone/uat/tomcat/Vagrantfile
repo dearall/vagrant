@@ -12,8 +12,6 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  # config.vm.box = "devalone-ubuntu-20.04-server-x64"
-  # config.vm.box = "devalone-ubuntu-20.04-server-x64-puppet"
   config.vm.box = "devalone/ubuntu-20.04-server-x64-puppet"
 
   # Disable automatic box update checking. If you disable this, then
@@ -35,13 +33,14 @@ Vagrant.configure("2") do |config|
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   # config.vm.network "private_network", ip: "192.168.33.10"
-  config.vm.network "public_network", ip: "192.168.0.2", hostname: true
-  config.vm.hostname = "dnsmasq.sansovo.org"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
   # config.vm.network "public_network"
+
+  config.vm.network "public_network", ip: "192.168.0.32", hostname: true
+  config.vm.hostname = "tomcat-uat.sansovo.org"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -54,13 +53,14 @@ Vagrant.configure("2") do |config|
   # Example for VirtualBox:
   #
   config.vm.provider "virtualbox" do |vb|
-    vb.name = "dnsmasq"
+    #   # name this virtual machine
+    vb.name = "tomcat-standalone-uat"
+    #
     #   # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
+    #   vb.gui = true
     #
     #   # Customize the amount of memory on the VM:
-    vb.memory = "1024"
-    vb.cpus = 2
+    vb.memory = "2048"
   end
   #
   # View the documentation for the provider you are using for more
@@ -74,14 +74,6 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
 
-  # vagrant file
-  config.vm.provision "file", source: "./files", destination: "/tmp/"
-
-  # shell bootstrap
-  config.vm.provision "bootstrap", type: "shell", privileged: true do |s|
-    s.inline = $bootstrap
-  end
-
   # shell set puppet server config, 只手动执行，避免重复执行私钥不匹配:
   #
   # vagrant provision --provision-with set-puppet-server
@@ -90,90 +82,159 @@ Vagrant.configure("2") do |config|
     s.inline = $set_puppet_server
   end
 
-  # puppet apply resolved module
-  config.vm.provision :puppet do |puppet|
-    # apply module_path
-    puppet.module_path = ["../puppet/puppet-modules"]
+  # vagrant file provision
+  config.vm.provision "file", source: "../../files", destination: "/tmp/"
 
-    # apply mainifest_file
-    puppet.manifests_path = "puppet/puppet-apply/dnsclient/manifests"
-    # puppet.manifest_file = "dnsclient.pp"
-    puppet.manifest_file = "dns_resolved.pp"
-
-    # apply environment
-    # puppet.environment_path = "puppet/environments"
-    # puppet.environment = "production"
-
-    puppet.options = "--test --verbose"
+  # shell bootstrap
+  config.vm.provision "bootstrap", type: "shell", privileged: true do |s|
+    s.inline = $bootstrap
   end
 
-  # shell seperator print
+  # shell seperator
   config.vm.provision "seperator1", type: "shell", privileged: true do |s|
     s.inline = $seperator1
   end
 
-  # puppet apply dnsmasq module
-  config.vm.provision :puppet do |puppet|
-    # apply module_path
-    puppet.module_path = ["puppet/modules"]
-
-    # apply mainifest_file
-    puppet.manifests_path = "puppet/puppet-apply/dnsmasq/manifests"
-    puppet.manifest_file = "dnsmasq.pp"
-
-    puppet.options = "--test --verbose"
-  end
-
-  # shell seperator print
+  # shell seperator
   config.vm.provision "seperator2", type: "shell", privileged: true do |s|
     s.inline = $seperator2
   end
 
-  # puppet apply ntp module
-  config.vm.provision :puppet do |puppet|
+  # puppet apply environment
+  config.vm.provision "puppet" do |puppet|
     # apply module_path
-    puppet.module_path = ["puppet/modules"]
+    puppet.module_path = ["../../../puppet/puppet-modules"]
 
-    # apply mainifest_file
-    puppet.manifests_path = "puppet/puppet-apply/ntp/manifests"
-    puppet.manifest_file = "ntp.pp"
+    # apply environment
+    puppet.environment_path = "../../../puppet/environments"
+    puppet.environment = "production"
 
     puppet.options = "--test --verbose"
   end
 
+  # shell JAVA_HOME
+  config.vm.provision "java_home", type: "shell", privileged: true do |s|
+    s.inline = $java_home
+  end
+
+  # shell seperator
+  config.vm.provision "seperator3", type: "shell", privileged: true do |s|
+    s.inline = $seperator3
+  end
+
+  # puppet apply tomcat9 and start tomcat service
+  # always run:
+  #
+  #   vagrant up
+  #   vagrant reload
+  #   vagrant provision
+  #   vagrant provision --provision-with start-tomcat
+  #
+  # shell set tomcat9_base dir
+  config.vm.provision "tomcat9_base_dir", type: "shell", privileged: true do |s|
+    s.inline = $tomcat9_base_dir
+  end
+
+  # shell set tomcat_users_xml
+  config.vm.provision "tomcat_users_xml", type: "shell", privileged: true do |s|
+    s.inline = $tomcat_users_xml
+  end
+
+  # always run tomcat
+  config.vm.provision "start-tomcat", type: "puppet", run: "always" do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
+    puppet.manifest_file = "tomcat9_seperate_start.pp"
+
+    puppet.options = "--test"
+  end
+
+  # puppet apply stop tomcat9
+  # never run
+  #
+  # do the following command to execute this provision:
+  #
+  #   vagrant provision --provision-with stop-tomcat
+  #
+  #
+  config.vm.provision "stop-tomcat", type: "puppet", run: "never" do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
+    puppet.manifest_file = "tomcat9_seperate_stop.pp"
+
+    puppet.options = "--test"
+  end
+
   # shell end
-  config.vm.provision "end", type: "shell", privileged: true, run: "always" do |s|
+  config.vm.provision "end", type: "shell", privileged: true do |s|
     s.inline = $end
   end
 end
 
+# inline shell scripts
 $bootstrap = <<-SCRIPT
-mv /tmp/files/hosts /etc/hosts
-mv /tmp/files/resolv.conf.dnsmasq /etc/resolv.conf.dnsmasq
-systemctl stop puppet.service
-apt-get update
-apt-get install --only-upgrade puppet-agent
 source /etc/profile.d/puppet-agent.sh
+systemctl stop puppet.service
 puppet config set server puppetserver.sansovo.org --section main
-puppet ssl bootstrap
+apt-get update
+SCRIPT
+
+# apt-get install --only-upgrade puppet-agent
+
+# shell tomcat9_base dir
+$tomcat9_base_dir = <<-SCRIPT
+mkdir -p /opt/tomcat9_base/logs
+mkdir -p /opt/tomcat9_base/temp
+cp -rfp /opt/tomcat9/conf /opt/tomcat9_base/
+cp -rfp /opt/tomcat9/webapps /opt/tomcat9_base/
+cp -rfp /opt/tomcat9/work /opt/tomcat9_base/
+chown -R tomcat:tomcat /opt/tomcat9_base
+SCRIPT
+
+# set tomcat config file
+$tomcat_users_xml = <<-SCRIPT
+cp -f /tmp/files/tomcat-users.xml /opt/tomcat9/conf/tomcat-users.xml
+cp -f /tmp/files/tomcat-users.xml /opt/tomcat9_base/conf/tomcat-users.xml
+cp -f /tmp/files/context.xml /opt/tomcat9_base/webapps/manager/META-INF/context.xml
+
+chown tomcat:tomcat /opt/tomcat9/conf/tomcat-users.xml
+chown tomcat:tomcat /opt/tomcat9_base/conf/tomcat-users.xml
+chown tomcat:tomcat /opt/tomcat9_base/webapps/manager/META-INF/context.xml
 SCRIPT
 
 # set puppet server shell script
 $set_puppet_server = <<-SCRIPT
 puppet config set server puppetserver.sansovo.org --section main
+puppet ssl bootstrap
 SCRIPT
 
 $seperator1 = <<-SCRIPT
-echo 'puppet resolved module complete.'
+echo 'seperator: puppet resolved module complete.'
 SCRIPT
 
 $seperator2 = <<-SCRIPT
-echo 'puppet dnsmasq module complete.'
+echo 'seperator: puppet apply ntp module complete.'
+SCRIPT
+
+$seperator3 = <<-SCRIPT
+echo 'seperator: puppet apply adoptjdk11 module complete.'
+SCRIPT
+
+$java_home = <<-SCRIPT
+source /etc/profile
+SCRIPT
+
+$seperator4 = <<-SCRIPT
+echo 'seperator: source /etc/profile complete.'
 SCRIPT
 
 $end = <<-SCRIPT
 apt-get clean
-sudo systemctl restart dnsmasq.service
+echo 'vagrant provision finished.'
 SCRIPT
-
-# puppet ssl bootstrap

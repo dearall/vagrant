@@ -5,14 +5,3 @@
 build
 
 .idea
-dist
-target
-out
-*.iml
-*.ipr
-*.iws
-bin
-.project
-.classpath
-.settings
-.vagrant

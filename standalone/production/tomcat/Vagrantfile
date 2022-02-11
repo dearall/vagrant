@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
   # your network.
   # config.vm.network "public_network"
 
-  config.vm.network "public_network", ip: "192.168.0.32", hostname: true
+  config.vm.network "public_network", ip: "192.168.0.33", hostname: true
   config.vm.hostname = "tomcat-production.sansovo.org"
 
   # Share an additional folder to the guest VM. The first argument is
@@ -140,13 +140,14 @@ Vagrant.configure("2") do |config|
     s.inline = $tomcat_users_xml
   end
 
+  # always run tomcat
   config.vm.provision "start-tomcat", type: "puppet", run: "always" do |puppet|
     # apply module_path
     puppet.module_path = ["../../../puppet/puppet-modules"]
 
     # apply mainifest_file
     puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
-    puppet.manifest_file = "tomcat9.pp"
+    puppet.manifest_file = "tomcat9_seperate_start.pp"
 
     puppet.options = "--test"
   end
@@ -165,7 +166,7 @@ Vagrant.configure("2") do |config|
 
     # apply mainifest_file
     puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
-    puppet.manifest_file = "tomcat9_stop.pp"
+    puppet.manifest_file = "tomcat9_seperate_stop.pp"
 
     puppet.options = "--test"
   end

@@ -131,22 +131,23 @@ Vagrant.configure("2") do |config|
   #   vagrant provision --provision-with start-tomcat
   #
   # shell set tomcat9_base dir
-  config.vm.provision "tomcat9_base_dir", type: "shell", privileged: true do |s|
-    s.inline = $tomcat9_base_dir
-  end
+  # config.vm.provision "tomcat9_base_dir", type: "shell", privileged: true do |s|
+  #   s.inline = $tomcat9_base_dir
+  # end
 
   # shell set tomcat_users_xml
   config.vm.provision "tomcat_users_xml", type: "shell", privileged: true do |s|
     s.inline = $tomcat_users_xml
   end
 
+  # always run tomcat
   config.vm.provision "start-tomcat", type: "puppet", run: "always" do |puppet|
     # apply module_path
     puppet.module_path = ["../../../puppet/puppet-modules"]
 
     # apply mainifest_file
     puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
-    puppet.manifest_file = "tomcat9.pp"
+    puppet.manifest_file = "tomcat9_same_start.pp"
 
     puppet.options = "--test"
   end
@@ -165,7 +166,7 @@ Vagrant.configure("2") do |config|
 
     # apply mainifest_file
     puppet.manifests_path = "../../../puppet/puppet-apply/tomcat/manifests"
-    puppet.manifest_file = "tomcat9_stop.pp"
+    puppet.manifest_file = "tomcat9_same_stop.pp"
 
     puppet.options = "--test"
   end
@@ -199,12 +200,9 @@ SCRIPT
 # set tomcat config file
 $tomcat_users_xml = <<-SCRIPT
 cp -f /tmp/files/tomcat-users.xml /opt/tomcat9/conf/tomcat-users.xml
-cp -f /tmp/files/tomcat-users.xml /opt/tomcat9_base/conf/tomcat-users.xml
-cp -f /tmp/files/context.xml /opt/tomcat9_base/webapps/manager/META-INF/context.xml
-
+cp -f /tmp/files/context.xml /opt/tomcat9/webapps/manager/META-INF/context.xml
 chown tomcat:tomcat /opt/tomcat9/conf/tomcat-users.xml
-chown tomcat:tomcat /opt/tomcat9_base/conf/tomcat-users.xml
-chown tomcat:tomcat /opt/tomcat9_base/webapps/manager/META-INF/context.xml
+chown tomcat:tomcat /opt/tomcat9/webapps/manager/META-INF/context.xml
 SCRIPT
 
 # set puppet server shell script
