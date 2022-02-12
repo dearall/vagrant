@@ -23,6 +23,9 @@ class adoptjdk11 {
   exec { 'source /etc/profile':
     command => "/usr/bin/bash -c 'source /etc/profile'",
     path    => '/usr/bin:/usr/sbin:/bin:/sbin',
+    user    => 'tomcat',
     require => File_line['path_java'],
   }
+
+  notify { 'installing adoptjdk11 ...': }
 }

@@ -10,7 +10,20 @@ file_line { 'path_java':
   match => '^export\ PATH\=',
 }
 
+# tomcat user and group
+group { 'tomcat' :
+  ensure => 'present',
+}
+user { 'tomcat' :
+  ensure     => 'present',
+  gid        => 'tomcat',
+  managehome => true,
+  require    => Group['tomcat']
+}
+
 exec { 'source /etc/profile':
   command => "bash -c 'source /etc/profile'",
   path    => '/usr/bin:/usr/sbin:/bin:/sbin',
+  user    => 'tomcat',
+  require => File_line['path_java'],
 }

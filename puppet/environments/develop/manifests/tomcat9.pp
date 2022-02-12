@@ -21,5 +21,6 @@ class tomcat9 {
     service_name   => 'tomcat9',
   }
 
-  notify { 'tomcat9 installed...':}
+
+  notify { 'installing tomcat9 ...':}
 }

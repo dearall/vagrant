@@ -6,6 +6,7 @@ tomcat::service { 'default':
   service_ensure => 'stopped',
 }
 
+
 notify { 'tomcat9 stopped...':
   require => Tomcat::Service['default'],
 }
