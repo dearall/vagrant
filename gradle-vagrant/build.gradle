@@ -1,67 +1,44 @@
-import com.manning.gia.vm.Vagrant
-
-ext.targetedVagrantProjectDir = file('../standalone/develop/tomcat')
-
-tasks.register('vagrantUp', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'starts and provisions the vagrant environment'
-
-    commands = ['up', '--color', '--provision']
-    dir = targetedVagrantProjectDir
+buildscript {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/central' }
+    }
+    dependencies {
+        classpath 'org.codehaus.groovy:groovy:3.0.9'
+    }
 }
 
-tasks.register('vagrantHalt', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'stops the vagrant machine'
+apply from: 'vagrant.gradle'
 
-    commands = ['halt']
-    dir = targetedVagrantProjectDir
+// web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性
+def propGA = project.hasProperty('war') ? project.getProperty('war') : 'manning'
+logger.quiet "Loading configuration for warGA '$propGA'."
+
+def webWarFile = file("$rootDir/config/webWarArtifact.groovy")
+def parsedWarGA = new ConfigSlurper(propGA).parse(webWarFile.toURI().toURL())
+
+// 环境部署环境属性读取，命令行使用 -Penv= 设置环境值
+def env = project.hasProperty('env') ? project.getProperty('env') : 'test'
+logger.quiet "Loading configuration for environment '$env'."
+
+def configFile = file("$rootDir/config/buildConfig.groovy")
+def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
+
+ext {
+    warGA = parsedWarGA
+    config = parsedConfig
 }
 
-tasks.register('vagrantDestroy', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'stops and deletes all traces of the vagrant machine'
+apply from: 'downloadWar.gradle'
 
-    commands = ['destroy', '--force']
-    dir = targetedVagrantProjectDir
+tasks.register('deployWar') {
+    doLast {
+        logger.quiet "Deploying WAR file to $config.server.hostname via SSH at port $config.server.sshPort."
+        logger.quiet "download url: ${config.binaryRepository.releaseUrl}"
+
+        logger.quiet "warGA.group: ${warGA.group}"
+        logger.quiet "warGA.name: ${warGA.name}"
+    }
 }
 
-tasks.register('vagrantSshConfig', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'outputs OpenSSH valid configuration to connect to the machine'
 
-    commands = ['ssh-config']
-    dir = targetedVagrantProjectDir
-}
 
-tasks.register('vagrantStatus', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'outputs status of the vagrant machine'
-
-    commands = ['status']
-    dir = targetedVagrantProjectDir
-}
-
-tasks.register('vagrantSuspend', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'suspends the machine'
-
-    commands = ['suspend']
-    dir = targetedVagrantProjectDir
-}
-
-tasks.register('vagrantResume', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'resume a suspended vagrant machine'
-
-    commands = ['resume']
-    dir = targetedVagrantProjectDir
-}
-
-tasks.register('vagrantReload', Vagrant) {
-    group = 'Vagrant Control'
-    description = 'restarts vagrant machine, loads new Vagrantfile configuration'
-
-    commands = ['reload']
-    dir = targetedVagrantProjectDir
-}

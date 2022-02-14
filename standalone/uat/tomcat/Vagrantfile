@@ -140,6 +140,11 @@ Vagrant.configure("2") do |config|
     s.inline = $tomcat_users_xml
   end
 
+  # shell h2_schema_files
+  config.vm.provision "h2_schema_files", type: "shell", privileged: true do |s|
+    s.inline = $h2_schema_files
+  end
+
   # always run tomcat
   config.vm.provision "start-tomcat", type: "puppet", run: "always" do |puppet|
     # apply module_path
@@ -212,6 +217,14 @@ cp -f /tmp/files/context.xml /opt/tomcat9_base/webapps/manager/META-INF/context.
 chown tomcat:tomcat /opt/tomcat9/conf/tomcat-users.xml
 chown tomcat:tomcat /opt/tomcat9_base/conf/tomcat-users.xml
 chown tomcat:tomcat /opt/tomcat9_base/webapps/manager/META-INF/context.xml
+SCRIPT
+
+$h2_schema_files = <<-SCRIPT
+mkdir /home/tomcat/h2
+cp -f /tmp/files/h2-2.1.210.jar   /home/tomcat/h2/h2-2.1.210.jar
+cp -f /tmp/files/todo-schema.sql  /home/tomcat/h2/todo-schema.sql
+chown tomcat:tomcat /home/tomcat/h2/h2-2.1.210.jar
+chown tomcat:tomcat /home/tomcat/h2/todo-schema.sql
 SCRIPT
 
 # set puppet server shell script

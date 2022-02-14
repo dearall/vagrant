@@ -1,0 +1,55 @@
+repositories {
+    maven {
+        url config.binaryRepository.releaseUrl
+        allowInsecureProtocol = true
+    }
+}
+
+def warArtifact_group = System.env.TODO_WEB_GROUP ?: "${warGA.group}"
+def warArtifact_name = System.env.TODO_WEB_NAME ?: "${warGA.name}"
+def warArtifact_version = 'latest.release'
+
+if(System.env.version_major) {
+    warArtifact_version = "${System.env.version_major}.${System.env.version_minor}"
+
+    if (System.env.version_fix) {
+        warArtifact_version += ".${System.env.version_fix}"
+    }
+}
+
+ext {
+    //warArtifact.group = warArtifact_group
+    //warArtifact.name = System.env.TODO_WEB_NAME ?: "${warGA.name}"
+
+    // warArtifact.version = 'latest.release'
+
+//    if(System.env.version_major) {
+//        warArtifact.version = "${System.env.version_major}.${System.env.version_minor}"
+//
+//        if (System.env.version_fix) {
+//            warArtifact.version += ".${System.env.version_fix}"
+//        }
+//    }
+
+    downloadDir = file("$buildDir/download/artifacts")
+}
+
+configurations {
+    webWarDeployment
+}
+
+dependencies {
+    webWarDeployment group: warArtifact_group, name: warArtifact_name, version: warArtifact_version,
+            ext: 'war'
+}
+
+tasks.register('fetchWebWar', Copy) {
+    from configurations.webWarDeployment
+    into downloadDir
+
+    doFirst {
+        logger.quiet 'warArtifact_group: ' + warArtifact_group
+        logger.quiet 'warArtifact_name: ' + warArtifact_name
+        logger.quiet 'warArtifact_version: ' +  warArtifact_version
+    }
+}
