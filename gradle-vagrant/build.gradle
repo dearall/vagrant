@@ -4,10 +4,16 @@ buildscript {
     }
     dependencies {
         classpath 'org.codehaus.groovy:groovy:3.0.9'
+
     }
 }
 
-apply from: 'vagrant.gradle'
+plugins {
+    id 'base'
+    id 'com.manning.gia.vagrant-plugin'
+    id 'com.manning.gia.ssh-plugin'
+}
+
 
 // web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性
 def propGA = project.hasProperty('war') ? project.getProperty('war') : 'manning'
@@ -17,7 +23,7 @@ def webWarFile = file("$rootDir/config/webWarArtifact.groovy")
 def parsedWarGA = new ConfigSlurper(propGA).parse(webWarFile.toURI().toURL())
 
 // 环境部署环境属性读取，命令行使用 -Penv= 设置环境值
-def env = project.hasProperty('env') ? project.getProperty('env') : 'test'
+def env = project.hasProperty('env') ? project.getProperty('env') : 'develop'
 logger.quiet "Loading configuration for environment '$env'."
 
 def configFile = file("$rootDir/config/buildConfig.groovy")
@@ -26,17 +32,90 @@ def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
 ext {
     warGA = parsedWarGA
     config = parsedConfig
+    tomcatRemoteDir = '/opt/tomcat9'
+    targetedVagrantProjectBaseDir = '../standalone'
 }
 
 apply from: 'downloadWar.gradle'
 
-tasks.register('deployWar') {
-    doLast {
+vagrant {
+    targetedVagrantProjectDir = file("${targetedVagrantProjectBaseDir}/${env}/tomcat")
+}
+
+ext {
+    // 这个用的是gradle 依赖缓存里的内容：
+    // 'G:\USER_HOME_2\.gradle\caches\modules-2\files-2.1\com.manning.gia.todo\todo-web\1.0
+    //  .1\eecff7429d8286cbfa4d527bcbb1cea2d998b003\todo-web-1.0.1.war'
+    warFile = configurations.warFileFetching.singleFile
+
+    // 这个用的是下载下来的内容，其实也是从 gradle 依赖缓存复制过来的文件
+    //warFile = file("${buildDir}/download/artifacts/${warArtifact_name}-${war_version}.war")
+}
+
+ssh {
+    sourceFile.set(warFile)
+
+    def remote = "${config.server.username}@${config.server.hostname}:/tmp"
+    println 'remote: ' + remote
+    remoteTempDir.set(remote)
+
+    vagrantKeyFile.set(file("$rootDir/config/ssh_private_key/vagrant_private_key"))
+    port.set(config.server.sshPort)
+
+    host.set(config.server.hostname)
+    username.set(config.server.username)
+}
+
+copyWarToServer.dependsOn(fetchWebWar)
+
+vagrantStopTomcat {
+    dependsOn(copyWarToServer)
+}
+
+// 以 ssh 命令方式停止 tomcat
+shutdownTomcat {
+    dependsOn(copyWarToServer)
+    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${tomcatRemoteDir}/bin/shutdown.sh")
+}
+
+//以 vagrant apply puppet 方式停止 tomcat
+stopTomcat {
+    dependsOn(vagrantStopTomcat)
+}
+
+deleteTomcatWebappsDir {
+    command.set("sudo -u tomcat rm -rf ${tomcatRemoteDir}/webapps/todo")
+}
+
+deleteTomcatWorkDir {
+    command.set("sudo -u tomcat rm -rf ${tomcatRemoteDir}/work")
+}
+
+copyWarToWebappsDir {
+    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${tomcatRemoteDir}/webapps/todo.war")
+}
+
+// 以 ssh 命令方式启动 tomcat
+startupTomcat {
+    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 $tomcatRemoteDir/bin/startup.sh")
+}
+
+//以 vagrant apply puppet 方式启动 tomcat
+startTomcat {
+    dependsOn(vagrantStartTomcat)
+}
+
+deployWar {
+    doFirst {
         logger.quiet "Deploying WAR file to $config.server.hostname via SSH at port $config.server.sshPort."
         logger.quiet "download url: ${config.binaryRepository.releaseUrl}"
 
         logger.quiet "warGA.group: ${warGA.group}"
         logger.quiet "warGA.name: ${warGA.name}"
+
+        logger.quiet 'targetedVagrantProjectDir: ' + "${targetedVagrantProjectBaseDir}/${env}/tomcat"
+        logger.quiet 'targetedVagrantProjectDir absolutePath: ' + vagrant.targetedVagrantProjectDir.get().getAsFile()
+                .getAbsolutePath()
     }
 }
 

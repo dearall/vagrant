@@ -1,0 +1,24 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+gradlePlugin {
+    plugins {
+        vagrantPlugin {
+            id = 'com.manning.gia.vagrant-plugin'
+            implementationClass = 'com.manning.gia.vm.VagrantPlugin'
+        }
+        sshPlugin {
+            id = 'com.manning.gia.ssh-plugin'
+            implementationClass = 'com.manning.gia.ssh.SshPlugin'
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+}
+
+repositories {
+    mavenCentral()
+}

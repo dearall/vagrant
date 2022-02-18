@@ -5,51 +5,73 @@ repositories {
     }
 }
 
-def warArtifact_group = System.env.TODO_WEB_GROUP ?: "${warGA.group}"
-def warArtifact_name = System.env.TODO_WEB_NAME ?: "${warGA.name}"
-def warArtifact_version = 'latest.release'
-
-if(System.env.version_major) {
-    warArtifact_version = "${System.env.version_major}.${System.env.version_minor}"
-
-    if (System.env.version_fix) {
-        warArtifact_version += ".${System.env.version_fix}"
-    }
-}
-
 ext {
-    //warArtifact.group = warArtifact_group
-    //warArtifact.name = System.env.TODO_WEB_NAME ?: "${warGA.name}"
+    //定义要下载和部署的 war 文件版本号
+    //war_version = '1.0.1'
+    war_version = 'latest.release'
 
-    // warArtifact.version = 'latest.release'
+    // war 文件版本号说明：
+    // latest.release ： 虽然适合于下载，但不适合于向远程机器传送 task,
+    // task 必须在配置阶段明确版本号，而 'latest.release' 是在 fetchWebWar task 执行阶段确定的最终版本号，在配置阶段具体
+    // 版本是未知的。因此这个具体的版本号无法在 ScpTask 的配置阶段得到具体的值，因此不能使用 'latest.release' 作为版本号
+    //
+    // 注： 这只是在开发测试时的方案，在 CI 环境下，不受此控制。CI 环境具体的版本号，由构建管道上级构建步骤中携带的代码版本号环境变量
+    // 确定，因此这个版本号也就不起作用了。CI 环境变量所确定的版本号是最真实可靠，真实反映出当前构建的确定版本。
+    warArtifact_version = war_version
+    if(System.env.version_major) {
+        warArtifact_version = "${System.env.version_major}.${System.env.version_minor}"
 
-//    if(System.env.version_major) {
-//        warArtifact.version = "${System.env.version_major}.${System.env.version_minor}"
-//
-//        if (System.env.version_fix) {
-//            warArtifact.version += ".${System.env.version_fix}"
-//        }
-//    }
+        if (System.env.version_fix) {
+            warArtifact_version += ".${System.env.version_fix}"
+        }
+    }
+
+    warArtifact_name = System.env.TODO_WEB_NAME ?: "${warGA.name}"
+    warArtifact_group = System.env.TODO_WEB_GROUP ?: "${warGA.group}"
 
     downloadDir = file("$buildDir/download/artifacts")
 }
 
 configurations {
-    webWarDeployment
+    warFileFetching {
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+        }
+    }
 }
 
 dependencies {
-    webWarDeployment group: warArtifact_group, name: warArtifact_name, version: warArtifact_version,
-            ext: 'war'
+    warFileFetching (group: warArtifact_group, name: warArtifact_name, version: warArtifact_version, ext: 'war')
 }
 
 tasks.register('fetchWebWar', Copy) {
-    from configurations.webWarDeployment
-    into downloadDir
+    group 'Fetch File'
+    description 'fetch war file from maven repository'
 
+    from configurations.warFileFetching
+    into downloadDir
+    /*
+    用于测试
+    rename { String filename ->
+        logger.quiet 'fetchWebWar filename: ' + filename
+        download_filename = filename
+        return null
+    }*/
+
+    /*
+    没有获得预期效果
+    outputs.doNotCacheIf 'do not cache this download', {
+        return true
+    }
+    */
     doFirst {
         logger.quiet 'warArtifact_group: ' + warArtifact_group
         logger.quiet 'warArtifact_name: ' + warArtifact_name
         logger.quiet 'warArtifact_version: ' +  warArtifact_version
     }
 }
+
+
+
+
+

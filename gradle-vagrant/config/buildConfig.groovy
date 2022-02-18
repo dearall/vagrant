@@ -4,38 +4,50 @@ binaryRepository {
 }
 
 environments {
-    local {
+    develop {
         server {
-            hostname = 'localhost'
-            sshPort = 2222
+            hostname = 'tomcat.sansovo.org'
+            sshPort = 22
             username = 'vagrant'
         }
         tomcat {
-            hostname = 'localhost'
+            hostname = 'tomcat.sansovo.org'
+            port = 8080
+            context = 'todo'
+        }
+    }
+    test {
+        server {
+            hostname = 'tomcat-test.sansovo.org'
+            sshPort = 22
+            username = 'vagrant'
+        }
+        tomcat {
+            hostname = 'tomcat-test.sansovo.org'
             port = 8080
             context = 'todo'
         }
     }
     uat {
         server {
-            hostname = 'localhost'
-            sshPort = 2223
+            hostname = 'tomcat-uat.sansovo.org'
+            sshPort = 22
             username = 'vagrant'
         }
         tomcat {
-            hostname = 'localhost'
+            hostname = 'tomcat-uat.sansovo.org'
             port = 8080
             context = 'todo'
         }
     }
     production {
         server {
-            hostname = 'localhost'
-            sshPort = 2224
+            hostname = 'tomcat-production.sansovo.org'
+            sshPort = 22
             username = 'vagrant'
         }
         tomcat {
-            hostname = 'localhost'
+            hostname = 'tomcat-production.sansovo.org'
             port = 8080
             context = 'todo'
         }
