@@ -1,0 +1,48 @@
+// The drivers we want to use
+def drivers = ["firefox", "chrome", "chromeHeadless"]
+
+drivers.each {driver ->
+    //功能测试： 创建 functionalTest
+    tasks.register("${driver}RemoteFunctionalTest", Test) {
+        group = 'verification'
+        description = "Runs remote functional tests with ${driver}"
+
+        // Fail the 'test' task on the first test failure
+        failFast = true
+
+        testLogging {
+            // show standard out and standard error of the test JVM(s) on the console
+            showStandardStreams true
+            // Sets the events to be logged.
+            events "passed", "skipped", "failed"
+        }
+
+        outputs.upToDateWhen { false }  // Always run tests
+
+        systemProperty "geb.build.reportsDir", reporting.file("geb/$name")
+        systemProperty "geb.env", driver
+        systemProperty 'geb.build.baseUrl', "http://${config.tomcat.hostname}:${config.tomcat.port}/${config.tomcat.context}/"
+    }
+}
+
+tasks.register('RemoteFunctionalTest') {
+    dependsOn(firefoxRemoteFunctionalTest, chromeRemoteFunctionalTest, chromeHeadlessRemoteFunctionalTest)
+
+    group = 'verification'
+    description = "Runs remote functional tests with 'firefox', 'chrome', 'chrome --headless --disable-gpu' by geb " +
+            "and selenium tools."
+}
+
+dependencies {
+    implementation 'org.gebish:geb-core:5.1'
+    implementation 'org.gebish:geb-junit4:5.1'
+    testImplementation 'junit:junit:4.13.2'
+
+    testImplementation 'org.seleniumhq.selenium:selenium-api:3.141.59'
+    testImplementation 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
+    testImplementation 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
+}
+
+repositories {
+    mavenCentral()
+}

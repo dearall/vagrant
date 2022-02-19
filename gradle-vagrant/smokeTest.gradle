@@ -1,0 +1,39 @@
+import com.manning.gia.smoke.HttpSmokeTest
+
+ext {
+    tomcatUrl = "http://$config.tomcat.hostname:$config.tomcat.port"
+    toDoAppUrl = "$tomcatUrl/$config.tomcat.context"
+}
+
+tasks.register('checkTomcatUrl', HttpSmokeTest) {
+    group 'Verification'
+    description 'smoke test tomcat url'
+
+    url = tomcatUrl
+    errorMessage = "Tomcat doesn't seem to be up."
+
+    doFirst {
+        logger.quiet "checkTomcatUrl tomcatUrl: $tomcatUrl"
+    }
+}
+
+tasks.register('checkApplicationUrl', HttpSmokeTest) {
+    dependsOn(checkTomcatUrl)
+
+    group 'Verification'
+    description 'smoke test todo web app url'
+
+    url = toDoAppUrl
+    errorMessage = "Application doesn't seem to be up."
+
+    doFirst {
+        logger.quiet "checkApplicationUrl toDoAppUrl: $toDoAppUrl"
+    }
+}
+
+tasks.register('smokeTests') {
+    dependsOn (checkApplicationUrl)
+
+    group 'Verification'
+    description 'smoke tests all the checks'
+}

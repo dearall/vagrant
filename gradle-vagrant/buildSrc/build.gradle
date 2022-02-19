@@ -17,6 +17,8 @@ gradlePlugin {
 
 dependencies {
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+    implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    //implementation 'io.github.http-builder-ng:http-builder-ng-core:1.0.4'
 }
 
 repositories {

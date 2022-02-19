@@ -64,6 +64,8 @@ class SshPlugin implements Plugin<Project> {
         project.tasks.register('shutdownTomcat', SshExecTask) {
 //          def tomcatRemoteDir = extension.tomcatRemoteDir.get()
 //          command.set("sudo -u tomcat ${extension.tomcatRemoteDir}/bin/shutdown.sh")
+            description '以 ssh 命令方式停止 tomcat'
+
             doFirst {
                 logger.quiet "Shutting down remote Tomcat."
             }
@@ -71,18 +73,23 @@ class SshPlugin implements Plugin<Project> {
 
         //以 vagrant apply puppet 方式停止 tomcat
         project.tasks.register('stopTomcat') {
+            group 'SSH Deploy'
+            description '以 vagrant apply puppet 方式停止 tomcat'
+
             doFirst {
                 logger.quiet "stopTomcat down remote Tomcat."
             }
         }
 
         project.tasks.register('deleteTomcatWebappsDir', SshExecTask) {
+            description "delete war file from tomcat 'webapp' directory"
             //dependsOn(project.tasks.named('shutdownTomcat'))
             dependsOn(project.tasks.named('stopTomcat'))
 //            def tomcatRemoteDir = extension.tomcatRemoteDir.get()
 //            command.set("sudo -u tomcat rm -rf ${extension.tomcatRemoteDir}/webapps/todo")
         }
         project.tasks.register('deleteTomcatWorkDir', SshExecTask) {
+            description "delete tomcat 'work' directoy"
             //dependsOn(project.tasks.named('shutdownTomcat'))
             dependsOn(project.tasks.named('stopTomcat'))
         }
@@ -106,6 +113,8 @@ class SshPlugin implements Plugin<Project> {
         project.tasks.register('startupTomcat', SshExecTask) {
             dependsOn(project.tasks.named('copyWarToWebappsDir'))
 
+            description '以 ssh 命令方式启动 tomcat'
+
             doFirst {
                 logger.quiet "Starting up remote Tomcat."
             }
@@ -113,6 +122,9 @@ class SshPlugin implements Plugin<Project> {
 
         //以 vagrant apply puppet 方式启动 tomcat
         project.tasks.register('startTomcat') {
+            group 'SSH Deploy'
+            description '以 vagrant apply puppet 方式启动 tomcat'
+
             dependsOn(project.tasks.named('copyWarToWebappsDir'))
 
             doFirst {

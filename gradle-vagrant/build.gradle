@@ -4,16 +4,14 @@ buildscript {
     }
     dependencies {
         classpath 'org.codehaus.groovy:groovy:3.0.9'
-
     }
 }
 
 plugins {
-    id 'base'
     id 'com.manning.gia.vagrant-plugin'
     id 'com.manning.gia.ssh-plugin'
+    id 'groovy'
 }
-
 
 // web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性
 def propGA = project.hasProperty('war') ? project.getProperty('war') : 'manning'
@@ -32,7 +30,7 @@ def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
 ext {
     warGA = parsedWarGA
     config = parsedConfig
-    tomcatRemoteDir = '/opt/tomcat9'
+    tomcat_home = '/opt/tomcat9'
     targetedVagrantProjectBaseDir = '../standalone'
 }
 
@@ -75,7 +73,7 @@ vagrantStopTomcat {
 // 以 ssh 命令方式停止 tomcat
 shutdownTomcat {
     dependsOn(copyWarToServer)
-    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${tomcatRemoteDir}/bin/shutdown.sh")
+    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${tomcat_home}/bin/shutdown.sh")
 }
 
 //以 vagrant apply puppet 方式停止 tomcat
@@ -84,20 +82,20 @@ stopTomcat {
 }
 
 deleteTomcatWebappsDir {
-    command.set("sudo -u tomcat rm -rf ${tomcatRemoteDir}/webapps/todo")
+    command.set("sudo -u tomcat rm -rf ${tomcat_home}/webapps/todo")
 }
 
 deleteTomcatWorkDir {
-    command.set("sudo -u tomcat rm -rf ${tomcatRemoteDir}/work")
+    command.set("sudo -u tomcat rm -rf ${tomcat_home}/work")
 }
 
 copyWarToWebappsDir {
-    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${tomcatRemoteDir}/webapps/todo.war")
+    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${tomcat_home}/webapps/todo.war")
 }
 
 // 以 ssh 命令方式启动 tomcat
 startupTomcat {
-    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 $tomcatRemoteDir/bin/startup.sh")
+    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 $tomcat_home/bin/startup.sh")
 }
 
 //以 vagrant apply puppet 方式启动 tomcat
@@ -119,5 +117,7 @@ deployWar {
     }
 }
 
+apply from: 'smokeTest.gradle'
+apply from: 'functionalTest.gradle'
 
 
