@@ -13,14 +13,21 @@ plugins {
     id 'groovy'
 }
 
-// web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+        vendor = JvmVendorSpec.ADOPTOPENJDK
+    }
+}
+
+// web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性(manning,sansovo 之一)
 def propGA = project.hasProperty('war') ? project.getProperty('war') : 'manning'
 logger.quiet "Loading configuration for warGA '$propGA'."
 
 def webWarFile = file("$rootDir/config/webWarArtifact.groovy")
 def parsedWarGA = new ConfigSlurper(propGA).parse(webWarFile.toURI().toURL())
 
-// 环境部署环境属性读取，命令行使用 -Penv= 设置环境值
+// 环境部署环境属性读取，命令行使用 -Penv= 设置环境值(develop, test, uat, production 之一)
 def env = project.hasProperty('env') ? project.getProperty('env') : 'develop'
 logger.quiet "Loading configuration for environment '$env'."
 

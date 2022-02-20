@@ -17,17 +17,16 @@ ext {
     //
     // 注： 这只是在开发测试时的方案，在 CI 环境下，不受此控制。CI 环境具体的版本号，由构建管道上级构建步骤中携带的代码版本号环境变量
     // 确定，因此这个版本号也就不起作用了。CI 环境变量所确定的版本号是最真实可靠，真实反映出当前构建的确定版本。
-    warArtifact_version = war_version
-    if(System.env.version_major) {
-        warArtifact_version = "${System.env.version_major}.${System.env.version_minor}"
+    war_artifact_version = war_version
+    if(System.env.VERSION_MAJOR) {
+        war_artifact_version = "${System.env.VERSION_MAJOR}.${System.env.VERSION_MINOR}"
 
-        if (System.env.version_fix) {
-            warArtifact_version += ".${System.env.version_fix}"
+        if (System.env.VERSION_FIX) {
+            war_artifact_version = "${System.env.VERSION_MAJOR}.${System.env.VERSION_MINOR}.${System.env.VERSION_FIX}"
         }
     }
-
-    warArtifact_name = System.env.TODO_WEB_NAME ?: "${warGA.name}"
-    warArtifact_group = System.env.TODO_WEB_GROUP ?: "${warGA.group}"
+    war_artifact_group = System.env.WEB_APP_WAR_GROUP ?: "${warGA.group}"
+    war_artifact_name  = System.env.WEB_APP_WAR_NAME ?: "${warGA.name}"
 
     downloadDir = file("$buildDir/download/artifacts")
 }
@@ -41,7 +40,7 @@ configurations {
 }
 
 dependencies {
-    warFileFetching (group: warArtifact_group, name: warArtifact_name, version: warArtifact_version, ext: 'war')
+    warFileFetching (group: war_artifact_group, name: war_artifact_name, version: war_artifact_version, ext: 'war')
 }
 
 tasks.register('fetchWebWar', Copy) {
@@ -65,9 +64,9 @@ tasks.register('fetchWebWar', Copy) {
     }
     */
     doFirst {
-        logger.quiet 'warArtifact_group: ' + warArtifact_group
-        logger.quiet 'warArtifact_name: ' + warArtifact_name
-        logger.quiet 'warArtifact_version: ' +  warArtifact_version
+        logger.quiet 'war_artifact_group: ' + war_artifact_group
+        logger.quiet 'war_artifact_name: ' + war_artifact_name
+        logger.quiet 'war_artifact_version: ' +  war_artifact_version
     }
 }
 

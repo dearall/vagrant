@@ -2,7 +2,7 @@
 def drivers = ["firefox", "chrome", "chromeHeadless"]
 
 drivers.each {driver ->
-    //功能测试： 创建 functionalTest
+    //功能测试： 创建 RemoteFunctionalTest
     tasks.register("${driver}RemoteFunctionalTest", Test) {
         group = 'verification'
         description = "Runs remote functional tests with ${driver}"
@@ -25,7 +25,7 @@ drivers.each {driver ->
     }
 }
 
-tasks.register('RemoteFunctionalTest') {
+tasks.register('remoteFunctionalTest') {
     dependsOn(firefoxRemoteFunctionalTest, chromeRemoteFunctionalTest, chromeHeadlessRemoteFunctionalTest)
 
     group = 'verification'

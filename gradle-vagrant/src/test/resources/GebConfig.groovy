@@ -7,7 +7,6 @@ waiting {
     timeout = 3
 }
 
-
 environments {
     firefox {
         driver = { new FirefoxDriver() }
