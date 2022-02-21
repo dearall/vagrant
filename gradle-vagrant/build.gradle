@@ -79,7 +79,7 @@ vagrantStopTomcat {
 // 以 ssh 命令方式停止 tomcat
 shutdownTomcat {
     dependsOn(copyWarToServer)
-    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${config.tomcat.catalina_home}/bin/shutdown.sh")
+    command.set("sudo -u tomcat JAVA_HOME=${config.tomcat.JAVA_HOME} ${config.tomcat.catalina_home}/bin/shutdown.sh")
 }
 
 //以 vagrant apply puppet 方式停止 tomcat
@@ -101,7 +101,7 @@ copyWarToWebappsDir {
 
 // 以 ssh 命令方式启动 tomcat
 startupTomcat {
-    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${config.tomcat.catalina_home}/bin/startup.sh")
+    command.set("sudo -u tomcat JAVA_HOME=${config.tomcat.JAVA_HOME} ${config.tomcat.catalina_home}/bin/startup.sh")
 }
 
 //以 vagrant apply puppet 方式启动 tomcat
