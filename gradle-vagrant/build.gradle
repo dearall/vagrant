@@ -88,7 +88,7 @@ stopTomcat {
 }
 
 deleteTomcatWebappsDir {
-    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/webapps/todo")
+    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}")
 }
 
 deleteTomcatWorkDir {
@@ -96,7 +96,7 @@ deleteTomcatWorkDir {
 }
 
 copyWarToWebappsDir {
-    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/todo.war")
+    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}.war")
 }
 
 // 以 ssh 命令方式启动 tomcat
