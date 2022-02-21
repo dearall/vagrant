@@ -54,7 +54,6 @@ class SshPlugin implements Plugin<Project> {
         project.tasks.register('copyWarToServer', ScpTask) {
             description = 'scp copy war file to remote web server'
             sourceFile = extension.sourceFile
-
             destination = extension.remoteTempDir
             keyFile = extension.vagrantKeyFile
             port = extension.port

@@ -49,6 +49,7 @@ tasks.register('fetchWebWar', Copy) {
 
     from configurations.warFileFetching
     into downloadDir
+
     /*
     用于测试
     rename { String filename ->
@@ -57,16 +58,23 @@ tasks.register('fetchWebWar', Copy) {
         return null
     }*/
 
-    /*
-    没有获得预期效果
-    outputs.doNotCacheIf 'do not cache this download', {
-        return true
-    }
+    /**
+     If the closure returns false, previous outputs of this task cannot be reused and the task will be executed.
+     That means the task is out-of-date and no outputs will be loaded from the build cache.
     */
+    outputs.upToDateWhen { false }  // Always run this task
+
     doFirst {
         logger.quiet 'war_artifact_group: ' + war_artifact_group
         logger.quiet 'war_artifact_name: ' + war_artifact_name
         logger.quiet 'war_artifact_version: ' +  war_artifact_version
+
+        logger.quiet "System.env.WEB_APP_WAR_GROUP: $System.env.WEB_APP_WAR_GROUP"
+        logger.quiet "System.env.WEB_APP_WAR_NAME: $System.env.WEB_APP_WAR_NAME"
+        logger.quiet "System.env.VERSION_MAJOR: $System.env.VERSION_MAJOR"
+        logger.quiet "System.env.VERSION_MINOR: $System.env.VERSION_MINOR"
+        logger.quiet "System.env.VERSION_FIX: $System.env.VERSION_FIX"
+        logger.quiet "System.env.SOURCE_BUILD_NUMBER: $System.env.SOURCE_BUILD_NUMBER"
     }
 }
 
