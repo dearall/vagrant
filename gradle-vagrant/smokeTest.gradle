@@ -2,7 +2,7 @@ import com.manning.gia.smoke.HttpSmokeTest
 
 ext {
     tomcatUrl = "http://$config.tomcat.hostname:$config.tomcat.port"
-    toDoAppUrl = "$tomcatUrl/$config.tomcat.context"
+    toDoAppUrl = "${tomcatUrl}/${config.tomcat.context}"
 }
 
 tasks.register('checkTomcatUrl', HttpSmokeTest) {

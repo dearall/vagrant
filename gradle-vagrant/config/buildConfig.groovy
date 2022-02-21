@@ -14,6 +14,8 @@ environments {
             hostname = 'tomcat.sansovo.org'
             port = 8080
             context = 'todo'
+            catalina_home = '/opt/tomcat9'
+            catalina_base = '/opt/tomcat9'
         }
     }
     test {
@@ -26,6 +28,8 @@ environments {
             hostname = 'tomcat-test.sansovo.org'
             port = 8080
             context = 'todo'
+            catalina_home = '/opt/tomcat9'
+            catalina_base = '/opt/tomcat9'
         }
     }
     uat {
@@ -38,6 +42,8 @@ environments {
             hostname = 'tomcat-uat.sansovo.org'
             port = 8080
             context = 'todo'
+            catalina_home = '/opt/tomcat9'
+            catalina_base = '/opt/tomcat9_base'
         }
     }
     production {
@@ -50,6 +56,8 @@ environments {
             hostname = 'tomcat-production.sansovo.org'
             port = 8080
             context = 'todo'
+            catalina_home = '/opt/tomcat9'
+            catalina_base = '/opt/tomcat9_base'
         }
     }
 }

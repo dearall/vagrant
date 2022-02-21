@@ -37,7 +37,6 @@ def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
 ext {
     warGA = parsedWarGA
     config = parsedConfig
-    tomcat_home = '/opt/tomcat9'
     targetedVagrantProjectBaseDir = '../standalone'
 }
 
@@ -80,7 +79,7 @@ vagrantStopTomcat {
 // 以 ssh 命令方式停止 tomcat
 shutdownTomcat {
     dependsOn(copyWarToServer)
-    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${tomcat_home}/bin/shutdown.sh")
+    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${config.tomcat.catalina_home}/bin/shutdown.sh")
 }
 
 //以 vagrant apply puppet 方式停止 tomcat
@@ -89,20 +88,20 @@ stopTomcat {
 }
 
 deleteTomcatWebappsDir {
-    command.set("sudo -u tomcat rm -rf ${tomcat_home}/webapps/todo")
+    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/webapps/todo")
 }
 
 deleteTomcatWorkDir {
-    command.set("sudo -u tomcat rm -rf ${tomcat_home}/work")
+    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/work")
 }
 
 copyWarToWebappsDir {
-    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${tomcat_home}/webapps/todo.war")
+    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/todo.war")
 }
 
 // 以 ssh 命令方式启动 tomcat
 startupTomcat {
-    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 $tomcat_home/bin/startup.sh")
+    command.set("sudo -u tomcat JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8 ${config.tomcat.catalina_home}/bin/startup.sh")
 }
 
 //以 vagrant apply puppet 方式启动 tomcat
