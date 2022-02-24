@@ -97,11 +97,6 @@ Vagrant.configure("2") do |config|
     s.inline = $seperator1
   end
 
-  # shell seperator
-  config.vm.provision "seperator2", type: "shell", privileged: true do |s|
-    s.inline = $seperator2
-  end
-
   # puppet apply environment
   config.vm.provision "puppet" do |puppet|
     # apply module_path
@@ -114,14 +109,14 @@ Vagrant.configure("2") do |config|
     puppet.options = "--test --verbose"
   end
 
+  # shell seperator
+  config.vm.provision "seperator2", type: "shell", privileged: true do |s|
+    s.inline = $seperator2
+  end
+
   # shell JAVA_HOME
   config.vm.provision "java_home", type: "shell", privileged: true do |s|
     s.inline = $java_home
-  end
-
-  # shell seperator
-  config.vm.provision "seperator3", type: "shell", privileged: true do |s|
-    s.inline = $seperator3
   end
 
   # puppet apply tomcat9 and start tomcat service
@@ -142,9 +137,44 @@ Vagrant.configure("2") do |config|
     s.inline = $tomcat_users_xml
   end
 
+  # shell seperator
+  config.vm.provision "seperator3", type: "shell", privileged: true do |s|
+    s.inline = $seperator3
+  end
+
   # shell h2_schema_files
   config.vm.provision "h2_schema_files", type: "shell", privileged: true do |s|
     s.inline = $h2_schema_files
+  end
+
+  # shell tomcat_install_apr
+  config.vm.provision "tomcat_install_apr", type: "shell", privileged: true do |s|
+    s.inline = $tomcat_install_apr
+  end
+
+  # shell arp /etc/profile LD_LIBRARY_PATH and LD_RUN_PATH
+  config.vm.provision "tomcat-apr", type: "puppet" do |puppet|
+    # apply module_path
+    puppet.module_path = ["../../../puppet/puppet-modules"]
+
+    # apply mainifest_file
+    puppet.manifests_path = "../../../puppet/puppet-apply/tomcat_apr_profile/manifests"
+    puppet.manifest_file = "apr.pp"
+
+    # environment
+    puppet.environment = "production"
+
+    puppet.options = "--test"
+  end
+
+  # shell tomcat_setenv_sh_attr
+  config.vm.provision "tomcat_setenv_sh_attr", type: "shell", privileged: true do |s|
+    s.inline = $tomcat_setenv_sh_attr
+  end
+
+  # shell seperator
+  config.vm.provision "seperator4", type: "shell", privileged: true do |s|
+    s.inline = $seperator4
   end
 
   # always run tomcat
@@ -208,6 +238,7 @@ cp -rfp /opt/tomcat9/conf /opt/tomcat9_base/
 cp -rfp /opt/tomcat9/webapps /opt/tomcat9_base/
 cp -rfp /opt/tomcat9/work /opt/tomcat9_base/
 chown -R tomcat:tomcat /opt/tomcat9_base
+
 SCRIPT
 
 # set tomcat config file
@@ -251,8 +282,51 @@ $java_home = <<-SCRIPT
 source /etc/profile
 SCRIPT
 
+$tomcat_install_apr = <<-SCRIPT
+cp -f /tmp/files/server.xml /opt/tomcat9_base/conf/server.xml
+chown tomcat:tomcat /opt/tomcat9_base/conf/server.xml
+
+
+apt-get install -y make gcc libssl-dev libapr1 libapr1-dev libaprutil1 libaprutil1-dev libexpat1 libexpat1-dev
+
+cd /tmp/files
+tar -zxvf apr-1.6.5.tar.gz
+cd apr-1.6.5
+./configure --prefix=/usr/local/apr
+make && sudo make install
+
+cd /tmp/files
+tar -zxvf apr-iconv-1.2.2.tar.gz
+cd /tmp/files/apr-iconv-1.2.2
+./configure   --with-apr=/usr/local/apr  --prefix=/usr/local/apr-iconv
+make && sudo make install
+
+cd /tmp/files
+tar -zxvf apr-util-1.6.1.tar.gz
+cd /tmp/files/apr-util-1.6.1
+./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr --with-apr-iconv=/usr/local/apr-iconv/bin/apriconv
+make && sudo make install
+
+cd /opt/tomcat9/bin
+tar -zxvf tomcat-native.tar.gz
+cd /opt/tomcat9/bin/tomcat-native-1.2.31-src/native
+./configure --with-apr=/usr/local/apr  --with-java-home=/usr/lib/jvm/jdk-11.0.13+8 --with-ssl=yes --prefix=/opt/tomcat9
+make && sudo make install
+
+rm /usr/lib/libtcnative-1.so
+rm /usr/lib64/libtcnative-1.so
+sudo ln -s /usr/local/apr/lib/libtcnative-1.so /usr/lib/libtcnative-1.so
+sudo ln -s /usr/local/apr/lib/libtcnative-1.so /usr/lib64/libtcnative-1.so
+
+SCRIPT
+
+$tomcat_setenv_sh_attr = <<-SCRIPT
+chown tomcat:tomcat /opt/tomcat9/bin/setenv.sh
+chmod a+x /opt/tomcat9/bin/setenv.sh
+SCRIPT
+
 $seperator4 = <<-SCRIPT
-echo 'seperator: source /etc/profile complete.'
+echo 'tomcat_install_apr complete.'
 SCRIPT
 
 $end = <<-SCRIPT

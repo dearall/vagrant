@@ -11,6 +11,21 @@ include 'h2_schema'
 
 notify { 'todo-scheme installed ...':}
 
+# CATALINA_HOME environment
+file_line { 'catalina_home':
+  path  => '/etc/profile',
+  line  => 'export CATALINA_HOME=/opt/tomcat9',
+  match => '^export\ CATALINA_HOME\=',
+}
+
+# CATALINA_BASE environment
+file_line { 'catalina_base':
+  path  => '/etc/profile',
+  line  => 'export CATALINA_BASE=/opt/tomcat9',
+  match => '^export\ CATALINA_BASE\=',
+}
+
+
 # start tomcat service
 tomcat::service { 'default':
   catalina_home  => '/opt/tomcat9',
