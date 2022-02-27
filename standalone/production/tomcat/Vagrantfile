@@ -232,8 +232,14 @@ SCRIPT
 
 # shell tomcat9_base dir
 $tomcat9_base_dir = <<-SCRIPT
-mkdir -p /opt/tomcat9_base/logs
-mkdir -p /opt/tomcat9_base/temp
+if [ ! -d /opt/tomcat9_base/logs ]; then
+    mkdir -p /opt/tomcat9_base/logs
+fi
+
+if [ ! -d /opt/tomcat9_base/temp ]; then
+    mkdir -p /opt/tomcat9_base/temp
+fi
+
 cp -rfp /opt/tomcat9/conf /opt/tomcat9_base/
 cp -rfp /opt/tomcat9/webapps /opt/tomcat9_base/
 cp -rfp /opt/tomcat9/work /opt/tomcat9_base/
@@ -253,7 +259,11 @@ chown tomcat:tomcat /opt/tomcat9_base/webapps/manager/META-INF/context.xml
 SCRIPT
 
 $h2_schema_files = <<-SCRIPT
-mkdir /home/tomcat/h2
+if [ ! -d /home/tomcat/h2 ]
+then
+    mkdir /home/tomcat/h2
+fi
+
 cp -f /tmp/files/h2-2.1.210.jar   /home/tomcat/h2/h2-2.1.210.jar
 cp -f /tmp/files/todo-schema.sql  /home/tomcat/h2/todo-schema.sql
 chown tomcat:tomcat /home/tomcat/h2/h2-2.1.210.jar
@@ -286,7 +296,6 @@ $tomcat_install_apr = <<-SCRIPT
 cp -f /tmp/files/server.xml /opt/tomcat9_base/conf/server.xml
 chown tomcat:tomcat /opt/tomcat9_base/conf/server.xml
 
-
 apt-get install -y make gcc libssl-dev libapr1 libapr1-dev libaprutil1 libaprutil1-dev libexpat1 libexpat1-dev
 
 cd /tmp/files
@@ -313,8 +322,16 @@ cd /opt/tomcat9/bin/tomcat-native-1.2.31-src/native
 ./configure --with-apr=/usr/local/apr  --with-java-home=/usr/lib/jvm/jdk-11.0.13+8 --with-ssl=yes --prefix=/opt/tomcat9
 make && sudo make install
 
-rm /usr/lib/libtcnative-1.so
-rm /usr/lib64/libtcnative-1.so
+if [ -L /usr/lib/libtcnative-1.so ]; then
+  echo "File '/usr/lib/libtcnative-1.so' exists and is a symbolic link, delete it"
+  sudo rm /usr/lib/libtcnative-1.so
+fi
+
+if [ -L /usr/lib64/libtcnative-1.so ]; then
+  echo "File '/usr/lib64/libtcnative-1.so' exists and is a symbolic link, delete it"
+  sudo rm /usr/lib64/libtcnative-1.so
+fi
+
 sudo ln -s /usr/local/apr/lib/libtcnative-1.so /usr/lib/libtcnative-1.so
 sudo ln -s /usr/local/apr/lib/libtcnative-1.so /usr/lib64/libtcnative-1.so
 
