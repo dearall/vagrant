@@ -39,24 +39,32 @@ class SshPlugin implements Plugin<Project> {
             task.group = 'SSH Deploy'
 
             classpath = project.configurations.jsch
+
+            host = extension.host
+            port = extension.port
+
+            username = extension.username
+            keyFile = extension.vagrantKeyFile
         }
         project.tasks.withType(SshExecTask).whenTaskAdded { SshExecTask task ->
             task.group = 'SSH Deploy'
 
             classpath = project.configurations.jsch
+
             host = extension.host
+            port = extension.port
+
             username = extension.username
             keyFile = extension.vagrantKeyFile
-            port = extension.port
+
             command = extension.command
         }
 
         project.tasks.register('copyWarToServer', ScpTask) {
             description = 'scp copy war file to remote web server'
+
             sourceFile = extension.sourceFile
             destination = extension.remoteTempDir
-            keyFile = extension.vagrantKeyFile
-            port = extension.port
         }
 
         // 以 ssh 命令方式停止 tomcat
@@ -76,7 +84,7 @@ class SshPlugin implements Plugin<Project> {
             description '以 vagrant apply puppet 方式停止 tomcat'
 
             doFirst {
-                logger.quiet "stopTomcat down remote Tomcat."
+                logger.quiet "stopping remote tomcat."
             }
         }
 
@@ -90,7 +98,7 @@ class SshPlugin implements Plugin<Project> {
         project.tasks.register('deleteTomcatWorkDir', SshExecTask) {
             description "delete tomcat 'work' directoy"
             //dependsOn(project.tasks.named('shutdownTomcat'))
-            dependsOn(project.tasks.named('stopTomcat'))
+            //dependsOn(project.tasks.named('stopTomcat'))
         }
 
         project.tasks.register('deleteOldArtifacts') {

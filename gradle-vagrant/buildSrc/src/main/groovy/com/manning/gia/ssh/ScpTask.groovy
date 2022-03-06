@@ -11,6 +11,15 @@ abstract class ScpTask extends DefaultTask {
     @InputFiles
     FileCollection classpath
 
+    @Input
+    abstract Property<String> getHost()
+
+    @Input
+    abstract Property<Integer> getPort()
+
+    @Input
+    abstract Property<String>  getUsername()
+
     @InputFile
     abstract RegularFileProperty getSourceFile()
 
@@ -20,17 +29,23 @@ abstract class ScpTask extends DefaultTask {
     @InputFile
     abstract RegularFileProperty getKeyFile()
 
-    @Input
-    abstract Property<Integer> getPort()
-
     @TaskAction
     void runCommand() {
-        logger.quiet "Copying file '${sourceFile.getAsFile().get().getAbsolutePath()}' to server."
+        logger.quiet "scp file '${sourceFile.getAsFile().get().getAbsolutePath()}' to server"
+        logger.quiet "scp file todir: '${destination.get()}'"
+        logger.quiet "scp file host: '${host.get()}'"
+        logger.quiet "scp file port: '${port.get()}'"
+        logger.quiet "scp file username: '${username.get()}'"
+        logger.quiet "scp file keyfile: '${keyFile.getAsFile().get().getAbsolutePath()}'"
 
         ant.taskdef(name: 'jschScp', classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp', classpath: classpath.asPath)
-        ant.jschScp(file: sourceFile.getAsFile().get().getAbsolutePath(),
-                todir: destination.get(),
+        ant.jschScp(
+                host: host.get(),
+                port: port.get(),
+                username: username.get(),
                 keyfile: keyFile.getAsFile().get().getAbsolutePath(),
-                port: port.get(), trust: true)
+                file: sourceFile.getAsFile().get().getAbsolutePath(),
+                todir: destination.get(),
+                trust: true)
     }
 }

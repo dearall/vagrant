@@ -32,10 +32,10 @@ abstract class SshExecTask extends DefaultTask {
 
         ant.taskdef(name: 'jschSshExec', classname: 'org.apache.tools.ant.taskdefs.optional.ssh.SSHExec', classpath: classpath.asPath)
         ant.jschSshExec(host: host.get(),
-                username: username.get(),
-                command: command.get(),
                 port: port.get(),
+                username: username.get(),
                 keyfile: keyFile.getAsFile().get().getAbsolutePath(),
+                command: command.get(),
                 trust: true)
     }
 }

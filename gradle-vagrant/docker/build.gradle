@@ -56,11 +56,10 @@ ssh {
     println 'remote: ' + remote
     remoteTempDir.set(remote)
 
-    vagrantKeyFile.set(file("$rootDir/config/ssh_private_key/id_rsa"))
-    port.set(config.server.sshPort)
-
     host.set(config.server.hostname)
+    port.set(config.server.sshPort)
     username.set(config.server.username)
+    vagrantKeyFile.set(file("$rootDir/config/ssh_private_key/docker_private_key"))
 }
 
 copyWarToServer.dependsOn(fetchWebWar)
@@ -68,7 +67,8 @@ copyWarToServer.dependsOn(fetchWebWar)
 // 以 ssh 命令方式停止 tomcat
 shutdownTomcat {
     dependsOn(copyWarToServer)
-    command.set("${config.tomcat.catalina_home}/bin/shutdown.sh")
+    //command.set("${config.tomcat.catalina_home}/bin/catalina.sh stop")
+    command.set("echo 'shutting down tomcat'")
 }
 
 deleteTomcatWebappsDir {
@@ -77,16 +77,18 @@ deleteTomcatWebappsDir {
 }
 
 deleteTomcatWorkDir {
+    dependsOn(shutdownTomcat)
     command.set("rm -rf ${config.tomcat.catalina_base}/work/Catalina/localhost/${config.tomcat.context}")
 }
 
 copyWarToWebappsDir {
-    command.set("cp /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}.war")
+    command.set("cp -f /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}.war")
 }
 
 // 以 ssh 命令方式启动 tomcat
 startupTomcat {
-    command.set("exec ${config.tomcat.catalina_home}/bin/catalina.sh run")
+    //command.set("exec ${config.tomcat.catalina_home}/bin/catalina.sh run")
+    command.set("echo 'startting up tomcat'")
 }
 
 // 部署任务链
@@ -101,3 +103,7 @@ deployWar {
     }
 }
 
+//冒烟测试
+apply from: '../gradle/buildlogic/smokeTest.gradle'
+//远程功能测试
+apply from: '../gradle/buildlogic/functionalTest.gradle'
