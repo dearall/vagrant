@@ -86,7 +86,7 @@ copyWarToWebappsDir {
 
 // 以 ssh 命令方式启动 tomcat
 startupTomcat {
-    command.set("${config.tomcat.catalina_home}/bin/catalina.sh run")
+    command.set("exec ${config.tomcat.catalina_home}/bin/catalina.sh run")
 }
 
 // 部署任务链

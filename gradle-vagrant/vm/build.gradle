@@ -113,8 +113,9 @@ startTomcat {
     dependsOn(vagrantStartTomcat)
 }
 
+// 部署任务链
 deployWar {
-    dependsOn(project.tasks.named('startTomcat'))
+    dependsOn(startTomcat)
     doFirst {
         logger.quiet "Deploying WAR file to $config.server.hostname via SSH at port $config.server.sshPort."
         logger.quiet "download url: ${config.binaryRepository.releaseUrl}"
@@ -128,7 +129,9 @@ deployWar {
     }
 }
 
+//冒烟测试
 apply from: '../gradle/buildlogic/smokeTest.gradle'
+//远程功能测试
 apply from: '../gradle/buildlogic/functionalTest.gradle'
 
 
