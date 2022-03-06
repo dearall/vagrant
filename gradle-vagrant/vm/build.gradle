@@ -43,7 +43,7 @@ ext {
     targetedVagrantProjectBaseDir = '../../standalone'
 }
 
-apply from: '../downloadWar.gradle'
+apply from: '../gradle/buildlogic/downloadWar.gradle'
 
 vagrant {
     targetedVagrantProjectDir = file("${targetedVagrantProjectBaseDir}/${env}/tomcat")
@@ -126,7 +126,7 @@ deployWar {
     }
 }
 
-apply from: '../smokeTest.gradle'
-apply from: '../functionalTest.gradle'
+apply from: '../gradle/buildlogic/smokeTest.gradle'
+apply from: '../gradle/buildlogic/functionalTest.gradle'
 
 
