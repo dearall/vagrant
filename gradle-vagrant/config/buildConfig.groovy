@@ -66,12 +66,12 @@ environments {
     }
     docker {
         server {
-            hostname = 'ubuntu-server.sansovo.org'
+            hostname = '192.168.0.113'
             sshPort = 2222
             username = 'root'
         }
         tomcat {
-            hostname = 'ubuntu-server.sansovo.org'
+            hostname = '192.168.0.113'
             port = 8080
             context = 'todo'
             catalina_home = '/opt/tomcat9'
