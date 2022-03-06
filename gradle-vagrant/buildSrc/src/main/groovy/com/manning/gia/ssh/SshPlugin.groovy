@@ -83,7 +83,7 @@ class SshPlugin implements Plugin<Project> {
         project.tasks.register('deleteTomcatWebappsDir', SshExecTask) {
             description "delete war file from tomcat 'webapp' directory"
             //dependsOn(project.tasks.named('shutdownTomcat'))
-            dependsOn(project.tasks.named('stopTomcat'))
+            //dependsOn(project.tasks.named('stopTomcat'))
 //            def tomcatRemoteDir = extension.tomcatRemoteDir.get()
 //            command.set("sudo -u tomcat rm -rf ${extension.tomcatRemoteDir}/webapps/todo")
         }
@@ -133,7 +133,7 @@ class SshPlugin implements Plugin<Project> {
 
         project.tasks.register('deployWar') {
             //dependsOn(project.tasks.named('startupTomcat'))
-            dependsOn(project.tasks.named('startTomcat'))
+            //dependsOn(project.tasks.named('startTomcat'))
 
             group = 'SSH Deploy'
             description = 'deploy war file to remote tomcat server'

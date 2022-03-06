@@ -64,4 +64,19 @@ environments {
             JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
         }
     }
+    docker {
+        server {
+            hostname = 'ubuntu-server.sansovo.org'
+            sshPort = 2222
+            username = 'root'
+        }
+        tomcat {
+            hostname = 'ubuntu-server.sansovo.org'
+            port = 8080
+            context = 'todo'
+            catalina_home = '/opt/tomcat9'
+            catalina_base = '/opt/tomcat9_base'
+            JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
+        }
+    }
 }

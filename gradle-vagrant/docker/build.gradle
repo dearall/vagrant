@@ -23,6 +23,7 @@ java {
     }
 }
 
+
 // web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性(manning,sansovo 之一)
 def propGA = project.hasProperty('war') ? project.getProperty('war') : 'manning'
 logger.quiet "Loading configuration for warGA '$propGA'."
@@ -30,8 +31,8 @@ logger.quiet "Loading configuration for warGA '$propGA'."
 def webWarFile = file("$rootDir/config/webWarArtifact.groovy")
 def parsedWarGA = new ConfigSlurper(propGA).parse(webWarFile.toURI().toURL())
 
-// 环境部署环境属性读取，命令行使用 -Penv= 设置环境值(develop, test, uat, production 之一)
-def env = project.hasProperty('env') ? project.getProperty('env') : 'develop'
+// 环境部署环境属性读取，命令行使用 -Penv= 设置环境值(develop, test, uat, production, docker 之一)
+def env = 'docker'
 logger.quiet "Loading configuration for environment '$env'."
 
 def configFile = file("$rootDir/config/buildConfig.groovy")
@@ -40,23 +41,12 @@ def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
 ext {
     warGA = parsedWarGA
     config = parsedConfig
-    targetedVagrantProjectBaseDir = '../../standalone'
 }
 
 apply from: '../gradle/buildlogic/downloadWar.gradle'
 
-vagrant {
-    targetedVagrantProjectDir = file("${targetedVagrantProjectBaseDir}/${env}/tomcat")
-}
-
 ext {
-    // 这个用的是gradle 依赖缓存里的内容：
-    // 'G:\USER_HOME_2\.gradle\caches\modules-2\files-2.1\com.manning.gia.todo\todo-web\1.0
-    //  .1\eecff7429d8286cbfa4d527bcbb1cea2d998b003\todo-web-1.0.1.war'
     warFile = configurations.warFileFetching.singleFile
-
-    // 这个用的是下载下来的内容，其实也是从 gradle 依赖缓存复制过来的文件
-    //warFile = file("${buildDir}/download/artifacts/${warArtifact_name}-${war_version}.war")
 }
 
 ssh {
@@ -66,7 +56,7 @@ ssh {
     println 'remote: ' + remote
     remoteTempDir.set(remote)
 
-    vagrantKeyFile.set(file("$rootDir/config/ssh_private_key/vagrant_private_key"))
+    vagrantKeyFile.set(file("$rootDir/config/ssh_private_key/id_rsa"))
     port.set(config.server.sshPort)
 
     host.set(config.server.hostname)
@@ -75,60 +65,39 @@ ssh {
 
 copyWarToServer.dependsOn(fetchWebWar)
 
-vagrantStopTomcat {
-    dependsOn(copyWarToServer)
-}
-
 // 以 ssh 命令方式停止 tomcat
 shutdownTomcat {
     dependsOn(copyWarToServer)
-    command.set("sudo -u tomcat JAVA_HOME=${config.tomcat.JAVA_HOME} ${config.tomcat.catalina_home}/bin/shutdown.sh")
-}
-
-//以 vagrant apply puppet 方式停止 tomcat
-stopTomcat {
-    dependsOn(vagrantStopTomcat)
+    command.set("${config.tomcat.catalina_home}/bin/shutdown.sh")
 }
 
 deleteTomcatWebappsDir {
-    dependsOn(stopTomcat)
-    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}")
+    dependsOn(shutdownTomcat)
+    command.set("rm -rf ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}")
 }
 
 deleteTomcatWorkDir {
-    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/work/Catalina/localhost/${config.tomcat.context}")
+    command.set("rm -rf ${config.tomcat.catalina_base}/work/Catalina/localhost/${config.tomcat.context}")
 }
 
 copyWarToWebappsDir {
-    command.set("sudo -u tomcat cp /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}.war")
+    command.set("cp /tmp/${warFile.name} ${config.tomcat.catalina_base}/webapps/${config.tomcat.context}.war")
 }
 
 // 以 ssh 命令方式启动 tomcat
 startupTomcat {
-    command.set("sudo -u tomcat JAVA_HOME=${config.tomcat.JAVA_HOME} ${config.tomcat.catalina_home}/bin/startup.sh")
+    command.set("${config.tomcat.catalina_home}/bin/catalina.sh run")
 }
 
-//以 vagrant apply puppet 方式启动 tomcat
-startTomcat {
-    dependsOn(vagrantStartTomcat)
-}
-
+// 部署任务链
 deployWar {
-    dependsOn(project.tasks.named('startTomcat'))
+    dependsOn(startupTomcat)
     doFirst {
         logger.quiet "Deploying WAR file to $config.server.hostname via SSH at port $config.server.sshPort."
         logger.quiet "download url: ${config.binaryRepository.releaseUrl}"
 
         logger.quiet "warGA.group: ${warGA.group}"
         logger.quiet "warGA.name: ${warGA.name}"
-
-        logger.quiet "targetedVagrantProjectDir: ${targetedVagrantProjectBaseDir}/${env}/tomcat"
-        logger.quiet 'targetedVagrantProjectDir absolutePath: ' + vagrant.targetedVagrantProjectDir.get().getAsFile()
-                .getAbsolutePath()
     }
 }
-
-apply from: '../gradle/buildlogic/smokeTest.gradle'
-apply from: '../gradle/buildlogic/functionalTest.gradle'
-
 
