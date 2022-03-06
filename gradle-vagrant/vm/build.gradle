@@ -95,7 +95,7 @@ deleteTomcatWebappsDir {
 }
 
 deleteTomcatWorkDir {
-    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/work")
+    command.set("sudo -u tomcat rm -rf ${config.tomcat.catalina_base}/work/Catalina/localhost/${config.tomcat.context}")
 }
 
 copyWarToWebappsDir {
