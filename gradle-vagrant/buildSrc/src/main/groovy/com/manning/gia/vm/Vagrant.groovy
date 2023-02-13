@@ -8,6 +8,7 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 
 abstract class Vagrant extends DefaultTask {
+
     static final String VAGRANT_EXECUTABLE = 'vagrant'
 
     @Input
@@ -19,7 +20,8 @@ abstract class Vagrant extends DefaultTask {
     @TaskAction
     void runCommand() {
         commands.add(0, VAGRANT_EXECUTABLE)
-        logger.info "Executing Vagrant command: '${commands.join(' ')}'"
+        logger.quiet "Executing Vagrant command: '${commands.join(' ')}'"
+        logger.quiet "Vagrant project dir: ${dir.get().asFile}"
 
         def process = commands.execute(null, dir.get().asFile)
         process.consumeProcessOutput(System.out, System.err)

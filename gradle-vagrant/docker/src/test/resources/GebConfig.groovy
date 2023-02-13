@@ -1,7 +1,6 @@
+import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.remote.DesiredCapabilities
 
 waiting {
     timeout = 3
@@ -19,7 +18,7 @@ environments {
     chromeHeadless {
         driver = {
             ChromeOptions options = new ChromeOptions()
-            options.addArguments("--headless", "--disable-gpu")
+            options.addArguments('--headless', '--disable-gpu')
 
             new ChromeDriver(options)
         }

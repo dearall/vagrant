@@ -10,4 +10,9 @@
 rootProject.name = 'gradle-vagrant'
 include 'vm', 'docker'
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
 

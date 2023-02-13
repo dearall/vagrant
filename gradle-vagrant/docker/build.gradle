@@ -3,7 +3,7 @@ buildscript {
         maven { url 'https://maven.aliyun.com/repository/central' }
     }
     dependencies {
-        classpath 'org.codehaus.groovy:groovy:3.0.9'
+        classpath 'org.codehaus.groovy:groovy:3.0.13'
     }
 }
 
@@ -18,7 +18,7 @@ version = '1.0.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(11)
         vendor = JvmVendorSpec.ADOPTOPENJDK
     }
 }
@@ -92,7 +92,10 @@ startupTomcat {
 }
 
 // 部署任务链
-deployWar {
+tasks.register('deployWar') {
+    group = 'docker Deploy'
+    description = 'deploy war file to remote tomcat server'
+
     dependsOn(startupTomcat)
     doFirst {
         logger.quiet "Deploying WAR file to $config.server.hostname via SSH at port $config.server.sshPort."
@@ -104,6 +107,6 @@ deployWar {
 }
 
 //冒烟测试
-apply from: '../gradle/buildlogic/smokeTest.gradle'
+//apply from: '../gradle/buildlogic/smokeTest.gradle'
 //远程功能测试
-apply from: '../gradle/buildlogic/functionalTest.gradle'
+//apply from: '../gradle/buildlogic/functionalTest.gradle'

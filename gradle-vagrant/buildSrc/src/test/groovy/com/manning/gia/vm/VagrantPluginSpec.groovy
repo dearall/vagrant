@@ -1,11 +1,12 @@
 package com.manning.gia.vm
 
-import com.manning.gia.vm.VagrantPlugin
+
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
-class VagrantPluginSpec extends Specification{
+class VagrantPluginSpec extends Specification {
+
     static final TASK_NAME = 'vagrantStatus'
     Project project
 
@@ -22,6 +23,7 @@ class VagrantPluginSpec extends Specification{
         project.vagrant {
             targetedVagrantProjectDir = file('../standalone/develop/tomcat')
         }
+
         then:
         project.plugins.hasPlugin(VagrantPlugin)
         project.extensions.findByName(VagrantPlugin.EXTENSION_NAME) != null

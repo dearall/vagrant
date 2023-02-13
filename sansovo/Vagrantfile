@@ -13,28 +13,28 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "devalone-ubuntu-20.04-server-x64"
-  
-  config.vm.define "tomcat", primary:true do |tomcat|
-	tomcat.vm.network "public_network", ip: "192.168.0.21", hostname:true
-	tomcat.vm.hostname = "tomcat.sansovo.org"
-  # tomcat.vm.provision :puppet do |puppet|
-  #    puppet.manifests_path = "manifests"
-  #    puppet.manifest_file = "tomcat.pp"
-  #  end
-  	tomcat.vm.provider "virtualbox" do |vb|
+
+  config.vm.define "tomcat", primary: true do |tomcat|
+    tomcat.vm.network "public_network", ip: "192.168.0.21", hostname: true
+    tomcat.vm.hostname = "tomcat.sansovo.org"
+    # tomcat.vm.provision :puppet do |puppet|
+    #    puppet.manifests_path = "manifests"
+    #    puppet.manifest_file = "tomcat.pp"
+    #  end
+    tomcat.vm.provider "virtualbox" do |vb|
       vb.name = "tomcat"
-	    vb.memory = "2048"
-	  end
+      vb.memory = "2048"
+    end
   end
   config.vm.define "web" do |web|
-  #   web.vm.box = "ubuntu-20.04-server"
-	  web.vm.network "public_network", ip: "192.168.0.22", hostname:true
-	  web.vm.hostname = "web.sansovo.org"
+    #   web.vm.box = "ubuntu-20.04-server"
+    web.vm.network "public_network", ip: "192.168.0.22", hostname: true
+    web.vm.hostname = "web.sansovo.org"
   end
   config.vm.define "db", autostart: false do |db|
-  #   db.vm.box = "ubuntu-20.04-server"
-	  db.vm.network "public_network", ip: "192.168.0.23", hostname:true
-	  db.vm.hostname = "db.sansovo.org"
+    #   db.vm.box = "ubuntu-20.04-server"
+    db.vm.network "public_network", ip: "192.168.0.23", hostname: true
+    db.vm.hostname = "db.sansovo.org"
   end
   config.vm.define "test" do |test|
     test.vm.network "public_network", type: "dhcp"
@@ -43,10 +43,10 @@ Vagrant.configure("2") do |config|
   config.vm.define "ruby" do |ruby|
     ruby.vm.network "public_network", type: "dhcp"
     ruby.vm.hostname = "ruby.sansovo.org"
-	
-	ruby.vm.provider "virtualbox" do |vb|
+
+    ruby.vm.provider "virtualbox" do |vb|
       vb.name = "ruby"
-	end
+    end
   end
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -84,12 +84,12 @@ Vagrant.configure("2") do |config|
   # Example for VirtualBox:
   #
   config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-      vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-      vb.memory = "1024"
-	  vb.cpus = 2
+    #   # Display the VirtualBox GUI when booting the machine
+    vb.gui = true
+    #
+    #   # Customize the amount of memory on the VM:
+    vb.memory = "1024"
+    vb.cpus = 2
   end
   #
   # View the documentation for the provider you are using for more
@@ -102,7 +102,7 @@ Vagrant.configure("2") do |config|
   echo I am provisioning...
   date > /etc/vagrant_provisioned_at
   SCRIPT
-  
+
   # config.vm.provision "shell", inline: $script
 
   config.vm.provision "shell", inline: <<-SHELL
@@ -110,13 +110,13 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
       echo "Hello World!"
   SHELL
-  
-  config.vm.provision "shell" do |s|    
-      s.inline = "echo $1"    
-	    s.args   = "'hello, vagrant!'"  
+
+  config.vm.provision "shell" do |s|
+    s.inline = "echo $1"
+    s.args = "'hello, vagrant!'"
   end
   config.vm.provision "shell" do |s|
     s.inline = "echo $1 $2"
-    s.args   = ["hello, world!", "hello vagrant!"]
+    s.args = ["hello, world!", "hello vagrant!"]
   end
 end

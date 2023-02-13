@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class SshPlugin implements Plugin<Project> {
+
     static final String EXTENSION_NAME = 'ssh'
 
     @Override
@@ -32,6 +33,7 @@ class SshPlugin implements Plugin<Project> {
 
         addTasks(project)
     }
+
     private void addTasks(Project project) {
         def extension = project.extensions.findByName(EXTENSION_NAME)
 
@@ -74,7 +76,7 @@ class SshPlugin implements Plugin<Project> {
             description '以 ssh 命令方式停止 tomcat'
 
             doFirst {
-                logger.quiet "Shutting down remote Tomcat."
+                logger.quiet 'Shutting down remote Tomcat.'
             }
         }
 
@@ -84,7 +86,7 @@ class SshPlugin implements Plugin<Project> {
             description '以 vagrant apply puppet 方式停止 tomcat'
 
             doFirst {
-                logger.quiet "stopping remote tomcat."
+                logger.quiet 'stopping remote tomcat.'
             }
         }
 
@@ -96,14 +98,14 @@ class SshPlugin implements Plugin<Project> {
 //            command.set("sudo -u tomcat rm -rf ${extension.tomcatRemoteDir}/webapps/todo")
         }
         project.tasks.register('deleteTomcatWorkDir', SshExecTask) {
-            description "delete tomcat 'work' directoy"
+            description "delete tomcat 'work' directory"
             //dependsOn(project.tasks.named('shutdownTomcat'))
             //dependsOn(project.tasks.named('stopTomcat'))
         }
 
         project.tasks.register('deleteOldArtifacts') {
             group = 'SSH Deploy'
-            description = 'delete tomcat web appsdir and tomcat work dir'
+            description = 'delete tomcat web apps dir and tomcat work dir'
 
             dependsOn(project.tasks.named('deleteTomcatWebappsDir'), project.tasks.named('deleteTomcatWorkDir'))
         }
@@ -112,7 +114,7 @@ class SshPlugin implements Plugin<Project> {
             dependsOn(project.tasks.named('deleteOldArtifacts'))
 
             doFirst {
-                logger.quiet "Deploying WAR file to Tomcat."
+                logger.quiet 'Deploying WAR file to Tomcat.'
             }
         }
 
@@ -123,7 +125,7 @@ class SshPlugin implements Plugin<Project> {
             description '以 ssh 命令方式启动 tomcat'
 
             doFirst {
-                logger.quiet "Starting up remote Tomcat."
+                logger.quiet 'Starting up remote Tomcat.'
             }
         }
 
@@ -135,16 +137,9 @@ class SshPlugin implements Plugin<Project> {
             dependsOn(project.tasks.named('copyWarToWebappsDir'))
 
             doFirst {
-                logger.quiet "Starting remote Tomcat."
+                logger.quiet 'Starting remote Tomcat.'
             }
-        }
-
-        project.tasks.register('deployWar') {
-            //dependsOn(project.tasks.named('startupTomcat'))
-            //dependsOn(project.tasks.named('startTomcat'))
-
-            group = 'SSH Deploy'
-            description = 'deploy war file to remote tomcat server'
         }
     }
 }
+

@@ -3,7 +3,7 @@ buildscript {
         maven { url 'https://maven.aliyun.com/repository/central' }
     }
     dependencies {
-        classpath 'org.codehaus.groovy:groovy:3.0.9'
+        classpath 'org.codehaus.groovy:groovy:3.0.13'
     }
 }
 
@@ -18,9 +18,29 @@ version = '1.0.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(11)
         vendor = JvmVendorSpec.ADOPTOPENJDK
     }
+}
+
+
+dependencies {
+    implementation (libs.bundles.groovy) // for spock test using groovy
+
+    // test framework
+    testImplementation (libs.junit4)
+    testImplementation (libs.spock.core)
+    testImplementation (libs.spock.junit4)
+    testImplementation (libs.geb.spock)
+    testImplementation (libs.geb.junit4)
+
+    // geb and selenium
+    testImplementation (libs.geb.core)
+    testImplementation (libs.selenium.java)
+    testImplementation (libs.selenium.support)
+    testImplementation (libs.selenium.firefox.driver)
+    testImplementation (libs.selenium.chrome.driver)
+    testImplementation (libs.webdrivermanager)
 }
 
 // web war 文件的 group, name 属性读取，命令行使用 -Pwar= 获取要部署的 web war 文件 GA 属性(manning,sansovo 之一)
@@ -37,16 +57,31 @@ logger.quiet "Loading configuration for environment '$env'."
 def configFile = file("$rootDir/config/buildConfig.groovy")
 def parsedConfig = new ConfigSlurper(env).parse(configFile.toURI().toURL())
 
+def vm = project.hasProperty('vm') ? project.getProperty('vm') : 'standalone'
+logger.quiet "Loading configuration for environment '$vm'."
+
+def vmFile = file("$rootDir/config/VagrantProjectConfig.groovy")
+def parsedvm = new ConfigSlurper(vm).parse(vmFile.toURI().toURL())
+
 ext {
     warGA = parsedWarGA
     config = parsedConfig
-    targetedVagrantProjectBaseDir = '../../standalone'
+    targetedVagrantProjectBaseDir = "../../${parsedvm.targetedVagrantProjectDirname}"
 }
 
 apply from: '../gradle/buildlogic/downloadWar.gradle'
 
+// 配置 vagrant-plugin 扩展信息
 vagrant {
-    targetedVagrantProjectDir = file("${targetedVagrantProjectBaseDir}/${env}/tomcat")
+    // Vagrant task 的目标 Vagrant 项目目录，即 Vagrantfile 文件所在目录
+    if (vm == 'standalone') {
+        targetedVagrantProjectDir = file("${targetedVagrantProjectBaseDir}/${env}/tomcat")
+    }
+    else {
+        targetedVagrantProjectDir = file("${targetedVagrantProjectBaseDir}")
+    }
+
+    logger.quiet "targetedVagrantProjectDir: ${targetedVagrantProjectDir.get().asFile}"
 }
 
 ext {
@@ -73,7 +108,9 @@ ssh {
     username.set(config.server.username)
 }
 
-copyWarToServer.dependsOn(fetchWebWar)
+copyWarToServer {
+    dependsOn(fetchWebWar)
+}
 
 vagrantStopTomcat {
     dependsOn(copyWarToServer)
@@ -111,11 +148,61 @@ startupTomcat {
 
 //以 vagrant apply puppet 方式启动 tomcat
 startTomcat {
-    dependsOn(vagrantStartTomcat)
+    dependsOn vagrantStartTomcat
 }
 
-// 部署任务链
-deployWar {
+// 启动 puppetserver vagrant project
+tasks.register ('startpuppetserver') {
+    group = 'vagrant Deploy'
+    description = 'startup puppetserver vagrant virtual machine'
+
+    dependsOn vagrantUp
+}
+
+// 停止 puppetserver vagrant project
+tasks.register ('stoppuppetserver') {
+    group = 'vagrant Deploy'
+    description = 'stop puppetserver vagrant virtual machine'
+
+    dependsOn vagrantHalt
+}
+
+// 启动 dnsmasq vagrant project
+tasks.register ('startdnsmasq') {
+    group = 'vagrant Deploy'
+    description = 'startup dnsmasq vagrant virtual machine'
+
+    dependsOn vagrantUpNoProvision
+}
+
+// 停止 dnsmasq vagrant project
+tasks.register ('stopdnsmasq') {
+    group = 'vagrant Deploy'
+    description = 'stop dnsmasq vagrant virtual machine'
+
+    dependsOn vagrantHalt
+}
+
+// 启动 deploy vagrant project virtual machine
+tasks.register ('startdeployvm') {
+    group = 'vagrant Deploy'
+    description = 'startup deploy vagrant virtual machine'
+
+    dependsOn vagrantUpNoProvision
+}
+
+// 停止 deploy vagrant project virtual machine
+tasks.register ('stopdeployvm') {
+    group = 'vagrant Deploy'
+    description = 'stop deploy vagrant virtual machine'
+
+    dependsOn vagrantHalt
+}
+// 部署 tomcat 任务链
+tasks.register('deployWar') {
+    group = 'vagrant Deploy'
+    description = 'deploy war file to remote tomcat server'
+
     dependsOn(startTomcat)
     doFirst {
         logger.quiet "Deploying WAR file to $config.server.hostname via SSH at port $config.server.sshPort."
@@ -130,8 +217,11 @@ deployWar {
     }
 }
 
+
+
 //冒烟测试
 apply from: '../gradle/buildlogic/smokeTest.gradle'
+
 //远程功能测试
 apply from: '../gradle/buildlogic/functionalTest.gradle'
 

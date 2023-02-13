@@ -1,8 +1,9 @@
 package com.manning.gia.todo.todo
 
-import geb.*
+import geb.Page
 
 class ToDoInsert extends Page {
-    static url = "insert"
-    static at = { title == "To Do application" }
+
+    static url = 'insert'
+    static at = { title == 'To Do application' }
 }

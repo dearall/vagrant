@@ -1,7 +1,7 @@
 # JAVA_HOME environment
 file_line { 'java_home':
   path => '/etc/profile',
-  line => 'export JAVA_HOME=/usr/lib/jvm/jdk-11.0.13+8',
+  line => 'export JAVA_HOME=/usr/lib/jvm/java',
 }
 
 file_line { 'path_java':

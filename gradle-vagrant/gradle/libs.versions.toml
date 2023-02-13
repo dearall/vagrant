@@ -1,0 +1,60 @@
+[versions]
+groovy  = "3.0.13"
+jupiter = "5.8.2"
+spock   = "2.0-groovy-3.0"
+gebVersion = "5.1"
+seleniumVersion = "3.141.59"
+
+
+[libraries]
+groovy-bom = {module = "org.codehaus.groovy:groovy-bom", version.ref = "groovy"}
+groovy-core = { module = "org.codehaus.groovy:groovy", version.ref = "groovy" }
+groovy-json = { module = "org.codehaus.groovy:groovy-json", version.ref = "groovy" }
+groovy-nio = { module = "org.codehaus.groovy:groovy-nio", version.ref = "groovy" }
+commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version = "3.12.0" }
+
+servlet-api = "javax.servlet:javax.servlet-api:4.0.1"
+jsp-api = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.3"
+jstl = "javax.servlet:jstl:1.2"
+taglibs-standard-impl = "org.apache.taglibs:taglibs-standard-impl:1.2.5"
+
+junit-jupiter-api = {module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jupiter"}
+junit-jupiter-engine = {module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jupiter"}
+junit-vintage-engine = {module = "org.junit.vintage:junit-vintage-engine", version.ref = "jupiter"}
+spock-bom = {module="org.spockframework:spock-bom", version.ref = "spock"}
+spock-core = {module = "org.spockframework:spock-core", version.ref = "spock"}
+spock-junit4 = {module = "org.spockframework:spock-junit4", version.ref = "spock"}
+junit4 = "junit:junit:4.13.2"
+hamcrest-core = "org.hamcrest:hamcrest-core:2.2"
+testng = "org.testng:testng:7.5"
+
+slf4j-simple = "org.slf4j:slf4j-simple:1.7.32"
+h2 = "com.h2database:h2:2.1.210"
+
+# Very groovy browser automation… web testing, screen scraping and more
+geb-core = {module = "org.gebish:geb-core", version.ref = "gebVersion"}
+geb-spock = {module = "org.gebish:geb-spock", version.ref = "gebVersion"}
+geb-junit4 = {module = "org.gebish:geb-junit4", version.ref = "gebVersion"}
+
+selenium-java = {module = "org.seleniumhq.selenium:selenium-java", version.ref = "seleniumVersion"}
+selenium-support = {module = "org.seleniumhq.selenium:selenium-support", version.ref = "seleniumVersion"}
+selenium-firefox-driver = {module = "org.seleniumhq.selenium:selenium-firefox-driver", version.ref = "seleniumVersion"}
+selenium-chrome-driver = {module = "org.seleniumhq.selenium:selenium-chrome-driver", version.ref = "seleniumVersion"}
+
+# WebDriverManager is an open-source Java library that carries out the management (i.e.,
+# download, setup, and maintenance) of the drivers required by Selenium WebDriver (e.g.,
+# chromedriver, geckodriver, msedgedriver, etc.) in a fully automated manner.
+webdrivermanager = 'io.github.bonigarcia:webdrivermanager:5.0.3'
+
+closure-compiler = "com.google.javascript:closure-compiler:v20131014"
+
+
+
+
+[bundles]
+groovy = ["groovy-core", "groovy-json", "groovy-nio"]
+junit-jupiter = ["junit-jupiter-api", "junit-jupiter-engine"]
+
+[plugins]
+
+

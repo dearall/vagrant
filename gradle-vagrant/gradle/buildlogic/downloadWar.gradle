@@ -7,7 +7,7 @@ repositories {
 
 ext {
     //定义要下载和部署的 war 文件版本号
-    //war_version = '1.0.1'
+    //war_version = '1.1.2'
     war_version = 'latest.release'
 
     // war 文件版本号说明：
@@ -18,7 +18,7 @@ ext {
     // 注： 这只是在开发测试时的方案，在 CI 环境下，不受此控制。CI 环境具体的版本号，由构建管道上级构建步骤中携带的代码版本号环境变量
     // 确定，因此这个版本号也就不起作用了。CI 环境变量所确定的版本号是最真实可靠，真实反映出当前构建的确定版本。
     war_artifact_version = war_version
-    if(System.env.VERSION_MAJOR) {
+    if (System.env.VERSION_MAJOR) {
         war_artifact_version = "${System.env.VERSION_MAJOR}.${System.env.VERSION_MINOR}"
 
         if (System.env.VERSION_FIX) {
@@ -62,7 +62,9 @@ tasks.register('fetchWebWar', Copy) {
      If the closure returns false, previous outputs of this task cannot be reused and the task will be executed.
      That means the task is out-of-date and no outputs will be loaded from the build cache.
     */
-    outputs.upToDateWhen { false }  // Always run this task
+    outputs.upToDateWhen {     // Always run this task
+        false
+    }
 
     doFirst {
         logger.quiet 'war_artifact_group: ' + war_artifact_group
@@ -77,8 +79,3 @@ tasks.register('fetchWebWar', Copy) {
         logger.quiet "System.env.SOURCE_BUILD_NUMBER: $System.env.SOURCE_BUILD_NUMBER"
     }
 }
-
-
-
-
-

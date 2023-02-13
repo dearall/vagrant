@@ -16,7 +16,7 @@ environments {
             context = 'todo'
             catalina_home = '/opt/tomcat9'
             catalina_base = '/opt/tomcat9'
-            JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
+            JAVA_HOME = '/usr/lib/jvm/jdk-11.0.13+8'
         }
     }
     test {
@@ -31,7 +31,7 @@ environments {
             context = 'todo'
             catalina_home = '/opt/tomcat9'
             catalina_base = '/opt/tomcat9'
-            JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
+            JAVA_HOME = '/usr/lib/jvm/jdk-11.0.13+8'
         }
     }
     uat {
@@ -46,7 +46,7 @@ environments {
             context = 'todo'
             catalina_home = '/opt/tomcat9'
             catalina_base = '/opt/tomcat9_base'
-            JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
+            JAVA_HOME = '/usr/lib/jvm/jdk-11.0.13+8'
         }
     }
     production {
@@ -61,7 +61,7 @@ environments {
             context = 'todo'
             catalina_home = '/opt/tomcat9'
             catalina_base = '/opt/tomcat9_base'
-            JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
+            JAVA_HOME = '/usr/lib/jvm/jdk-11.0.13+8'
         }
     }
     docker {
@@ -76,7 +76,7 @@ environments {
             context = 'todo'
             catalina_home = '/opt/tomcat9'
             catalina_base = '/opt/tomcat9_base'
-            JAVA_HOME='/usr/lib/jvm/jdk-11.0.13+8'
+            JAVA_HOME = '/usr/lib/jvm/jdk-11.0.13+8'
         }
     }
 }

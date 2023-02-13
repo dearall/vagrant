@@ -1,10 +1,10 @@
 package com.manning.gia.vm
 
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class VagrantPlugin implements Plugin<Project> {
+
     static final String EXTENSION_NAME = 'vagrant'
 
     @Override
@@ -26,6 +26,10 @@ class VagrantPlugin implements Plugin<Project> {
         project.tasks.register('vagrantUp', Vagrant) {
             commands = ['up', '--color']
             description = 'starts and provisions the vagrant environment'
+        }
+        project.tasks.register('vagrantUpNoProvision', Vagrant) {
+            commands = ['up', '--color', '--no-provision']
+            description = 'starts and no provisions the vagrant environment'
         }
         project.tasks.register('vagrantHalt', Vagrant) {
             commands = ['halt']
